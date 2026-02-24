@@ -83,6 +83,7 @@
 </head>
 <body class="min-h-screen flex flex-col relative text-gray-100 overflow-x-hidden">
 
+    <!-- Decorative background elements -->
     <div class="fixed top-[-10%] left-[-10%] w-[40vw] h-[40vw] rounded-full bg-blue-600/10 blur-[120px] z-[-1] pointer-events-none"></div>
     <div class="fixed bottom-[-10%] right-[-10%] w-[40vw] h-[40vw] rounded-full bg-purple-600/10 blur-[120px] z-[-1] pointer-events-none"></div>
 
@@ -108,6 +109,7 @@
 
     <main class="flex-grow container mx-auto px-4 py-4 relative z-10 flex flex-col items-center pb-24">
         
+        <!-- Tab: Calculator -->
         <div id="trackerTab" class="hidden w-full flex flex-col items-center animate-fade-in">
             <div class="glass-effect rounded-3xl p-8 mb-6 text-center border-l-4 border-blue-500 max-w-2xl">
                 <h2 class="text-xl font-bold text-white mb-2">Calculadora Principal</h2>
@@ -115,6 +117,7 @@
             </div>
         </div>
 
+        <!-- Tab: Reddit Leaks -->
         <div id="leaksTab" class="hidden w-full max-w-6xl flex flex-col items-center animate-fade-in">
             <div class="w-full flex flex-col sm:flex-row justify-between items-start sm:items-end mb-8 gap-4 px-2">
                 <div>
@@ -132,6 +135,7 @@
             <div id="leaksGrid" class="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </div>
 
+        <!-- Tab: Telegram Feed -->
         <div id="telegramTab" class="hidden w-full max-w-6xl flex flex-col items-center animate-fade-in">
             <div class="w-full flex flex-col sm:flex-row justify-between items-start sm:items-end mb-8 gap-4 px-2">
                 <div>
@@ -139,7 +143,7 @@
                         <svg class="w-6 h-6 text-[#2AABEE]" fill="currentColor" viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 000 12a12 12 0 0012 12 12 12 0 0012-12A12 12 0 0012 0a12 12 0 00-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 01.171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.896-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
                         Feed de Telegram
                     </h2>
-                    <p class="text-sm text-gray-400 mt-1">Canal actual: <span id="currentTelegramChannel" class="text-[#2AABEE] font-bold">@team_mew</span> (Últimos 40 mensajes)</p>
+                    <p class="text-sm text-gray-400 mt-1">Canal actual: <span id="currentTelegramChannel" class="text-[#2AABEE] font-bold">@team_mew</span> (Últimos 25 mensajes)</p>
                 </div>
                 <div class="flex gap-2">
                     <div class="relative flex-1 sm:w-48">
@@ -157,6 +161,7 @@
 
     </main>
 
+    <!-- Unified Modal for Reddit and Telegram -->
     <div id="postModal" class="fixed inset-0 z-[100] hidden opacity-0 transition-opacity duration-300 flex items-center justify-center p-4">
         <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closePostModal()"></div>
         <div id="postModalContent" class="relative w-full max-w-3xl max-h-[90vh] glass-effect border border-white/20 rounded-3xl shadow-2xl flex flex-col overflow-hidden transition-transform duration-300 scale-95">
@@ -183,6 +188,7 @@
         window.loadedRedditPosts = [];
         window.loadedTelegramPosts = [];
 
+        // Tab System
         function switchTab(tabId) {
             const tabs = ['tracker', 'leaks', 'telegram'];
             const activeClass = "px-6 py-2.5 rounded-xl font-bold transition-all duration-300 bg-white/15 text-white shadow-lg border border-white/10 text-sm md:text-base";
@@ -199,6 +205,7 @@
             });
         }
 
+        // Reddit Loader
         async function loadCustomLeaks() {
             const grid = document.getElementById('leaksGrid');
             grid.innerHTML = Array(6).fill(`<div class="glass-effect rounded-2xl p-5 animate-pulse"><div class="h-4 w-24 bg-white/10 rounded mb-4"></div><div class="h-10 w-full bg-white/10 rounded mb-4"></div><div class="h-40 w-full bg-white/10 rounded"></div></div>`).join('');
@@ -241,6 +248,7 @@
             } catch (e) { console.error(e); }
         }
 
+        // Telegram Scraper Loader
         async function loadTelegramFeed() {
             const inputField = document.getElementById('telegramInput');
             let channelName = inputField.value.trim().replace('@', '') || "team_mew";
@@ -263,14 +271,16 @@
                     return;
                 }
 
-                // Aumentado a los últimos 40 mensajes para cubrir aproximadamente las últimas 24 horas
-                const recentMessages = Array.from(messages).reverse().slice(0, 40);
+                // Limit adjusted to 25 messages for better speed
+                const recentMessages = Array.from(messages).reverse().slice(0, 25);
                 recentMessages.forEach(msg => {
                     const textEl = msg.querySelector('.tgme_widget_message_text');
                     const cleanText = textEl ? textEl.innerHTML : 'Mensaje multimedia';
+                    
                     const photos = msg.querySelectorAll('.tgme_widget_message_photo_wrap');
                     const videos = msg.querySelectorAll('.tgme_widget_message_video_thumb');
                     const media = [];
+                    
                     photos.forEach(p => {
                         const m = p.style.backgroundImage.match(/url\(['"]?(.*?)['"]?\)/);
                         if(m) media.push({type: 'photo', url: m[1]});
@@ -315,6 +325,7 @@
             } catch (e) { console.error(e); }
         }
 
+        // Unified Modal Logic
         function openModal(type, index) {
             const modal = document.getElementById('postModal');
             const content = document.getElementById('postModalContent');
@@ -333,6 +344,7 @@
                 sourceLink.href = `https://reddit.com${post.permalink}`;
                 sourceBtnText.textContent = "Ver en Reddit";
                 sourceLink.className = "bg-orange-600 hover:bg-orange-500 text-white px-6 py-2.5 rounded-xl font-bold transition text-sm flex items-center gap-2";
+                
                 if (post.is_video && post.secure_media?.reddit_video) {
                     contentHtml += `<video controls autoplay muted class="w-full rounded-xl bg-black max-h-[50vh]"><source src="${post.secure_media.reddit_video.fallback_url}" type="video/mp4"></video>`;
                 } else if (post.is_gallery && post.media_metadata) {
@@ -343,6 +355,7 @@
                 } else if (post.url && post.url.match(/\.(jpeg|jpg|gif|png)$/i)) {
                     contentHtml += `<img src="${post.url}" class="w-full rounded-xl bg-black/20 border border-white/5">`;
                 }
+                
                 if (post.selftext_html) {
                     const txt = document.createElement('div');
                     txt.innerHTML = post.selftext_html.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&amp;/g, '&');
@@ -355,6 +368,7 @@
                 sourceLink.href = post.link;
                 sourceBtnText.textContent = "Abrir Telegram";
                 sourceLink.className = "bg-[#2AABEE] hover:bg-[#2298d6] text-white px-6 py-2.5 rounded-xl font-bold transition text-sm flex items-center gap-2";
+                
                 if (post.media && post.media.length > 0) {
                     contentHtml += `<div class="flex flex-col gap-4">`;
                     post.media.forEach(m => {
@@ -382,6 +396,7 @@
             setTimeout(() => { modal.classList.add('hidden'); document.getElementById('modalBody').innerHTML = ''; document.body.style.overflow = ''; }, 300);
         }
 
+        // Time Utility
         function getTimeAgo(date) {
             const seconds = Math.floor((new Date() - date) / 1000);
             let interval = seconds / 86400;
@@ -394,7 +409,7 @@
         }
 
         window.addEventListener('DOMContentLoaded', () => {
-            switchTab('leaks'); // Abrir en Leaks por defecto para pruebas
+            switchTab('leaks'); // Default tab for testing
             loadCustomLeaks();
             loadTelegramFeed();
         });
