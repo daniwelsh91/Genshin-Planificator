@@ -6,30 +6,21 @@
     <title>Genshin Tracker - SANDBOX (Entorno de Pruebas)</title>
 
     <meta name="theme-color" content="#0b0f1a">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
-    
-    <!-- SCRIPT OFICIAL DE TWITTER WIDGETS -->
-    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 
     <style>
         body {
             font-family: 'Inter', sans-serif;
             background-color: #0b0f1a;
             color: #f1f5f9;
-            /* BACKGROUND IMAGE CONFIGURATION */
-            background-image: url('fondo.png'); /* Usa tu fondo local */
+            background-image: url('fondo.png');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
             background-repeat: no-repeat;
         }
         
-        /* Fallback si no hay imagen */
         body::before {
             content: "";
             position: fixed;
@@ -39,252 +30,242 @@
         }
 
         .glass-effect {
-            background: rgba(15, 23, 42, 0.4);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.08);
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-4px);
+            background: rgba(30, 41, 59, 0.7);
+            border-color: rgba(96, 165, 250, 0.4);
+            box-shadow: 0 10px 30px -10px rgba(59, 130, 246, 0.3);
+        }
+
         .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
         
-        /* Custom scrollbar para el interior del widget de twitter si es posible */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
-        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+        .leak-tag {
+            background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%);
+            color: white;
+            font-size: 0.65rem;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .tag-questionable { background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%); }
+        .tag-reliable { background: linear-gradient(90deg, #10b981 0%, #059669 100%); }
+        .tag-official { background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%); }
     </style>
 </head>
 <body class="min-h-screen flex flex-col relative text-gray-100 overflow-x-hidden">
 
-    <!-- Círculos decorativos de fondo -->
+    <!-- Círculos decorativos -->
     <div class="fixed top-[-10%] left-[-10%] w-[40vw] h-[40vw] rounded-full bg-blue-600/10 blur-[120px] z-[-1] pointer-events-none"></div>
     <div class="fixed bottom-[-10%] right-[-10%] w-[40vw] h-[40vw] rounded-full bg-purple-600/10 blur-[120px] z-[-1] pointer-events-none"></div>
 
-    <!-- Header -->
     <header class="w-full pt-8 pb-4 relative z-20">
         <div class="container mx-auto px-4 flex flex-col items-center">
             <h1 class="text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-300 via-purple-300 to-indigo-300 tracking-tight text-center drop-shadow-lg mb-2">
                 Genshin Tracker <span class="text-xs align-top text-red-400 font-bold ml-2 bg-red-900/30 px-2 py-1 rounded-md border border-red-500/30">SANDBOX</span>
             </h1>
-            <p class="text-blue-200/60 font-medium tracking-wide text-sm mb-6">LABORATORIO DE PRUEBAS</p>
-
-            <!-- SISTEMA DE PESTAÑAS (TABS) -->
-            <div class="flex gap-2 bg-black/40 p-1.5 rounded-2xl backdrop-blur-md border border-white/10 shadow-xl">
-                <button id="btnTabTracker" onclick="switchTab('tracker')" class="px-6 py-2.5 rounded-xl font-bold transition-all duration-300 bg-white/15 text-white shadow-lg border border-white/10 text-sm md:text-base">
-                    <svg class="w-4 h-4 inline-block mr-1 -mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+            
+            <div class="flex gap-2 bg-black/40 p-1.5 rounded-2xl backdrop-blur-md border border-white/10 shadow-xl mt-4">
+                <button id="btnTabTracker" onclick="switchTab('tracker')" class="px-6 py-2.5 rounded-xl font-bold transition-all duration-300 text-gray-400 hover:text-white hover:bg-white/5 text-sm md:text-base border border-transparent">
                     Calculadora
                 </button>
-                <button id="btnTabLeaks" onclick="switchTab('leaks')" class="px-6 py-2.5 rounded-xl font-bold transition-all duration-300 text-gray-400 hover:text-white hover:bg-white/5 text-sm md:text-base border border-transparent">
-                    <svg class="w-4 h-4 inline-block mr-1 -mt-1" fill="currentColor" viewBox="0 0 24 24"><path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/></svg>
+                <button id="btnTabLeaks" onclick="switchTab('leaks')" class="px-6 py-2.5 rounded-xl font-bold transition-all duration-300 bg-white/15 text-white shadow-lg border border-white/10 text-sm md:text-base">
                     Noticias / Leaks
                 </button>
             </div>
         </div>
     </header>
 
-    <!-- Main Content -->
     <main class="flex-grow container mx-auto px-4 py-4 relative z-10 flex flex-col items-center pb-24">
         
-        <!-- ========================================== -->
-        <!-- PESTAÑA 1: CALCULADORA MAIN (Tu app actual) -->
-        <!-- ========================================== -->
-        <div id="trackerTab" class="w-full flex flex-col items-center animate-fade-in">
+        <!-- PESTAÑA CALCULADORA -->
+        <div id="trackerTab" class="hidden w-full flex flex-col items-center animate-fade-in">
             <div class="glass-effect rounded-3xl p-8 mb-6 text-center border-l-4 border-blue-500 max-w-2xl">
-                <h2 class="text-xl font-bold text-white mb-2">Sección de la Calculadora Oculta (Mockup)</h2>
-                <p class="text-gray-400 text-sm">Para no saturar el código de este entorno de prueba, he colapsado tu código principal aquí. Imagina que aquí están todas tus tarjetas de "Saldo Actual", "Potencial", "Pity", etc. <br><br><b>Haz clic en la pestaña "Noticias / Leaks" arriba para ver la magia.</b></p>
+                <h2 class="text-xl font-bold text-white mb-2">Calculadora Principal</h2>
+                <p class="text-gray-400 text-sm">El tracker está oculto en esta prueba.</p>
             </div>
         </div>
 
-        <!-- ========================================== -->
-        <!-- PESTAÑA 2: TWITTER FEED / LEAKS            -->
-        <!-- ========================================== -->
-        <div id="leaksTab" class="hidden w-full max-w-4xl flex flex-col items-center animate-fade-in">
-            <div class="glass-effect rounded-3xl p-6 md:p-8 w-full">
-                
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-                    <div>
-                        <h2 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-[#1DA1F2] drop-shadow-sm flex items-center gap-2">
-                            X Feed Integrado
-                        </h2>
-                        <p class="text-sm text-gray-400 mt-1">Ingresa el enlace o el @ de una cuenta de X (Twitter) para ver sus posts.</p>
-                    </div>
+        <!-- PESTAÑA LEAKS NATIVA -->
+        <div id="leaksTab" class="w-full max-w-6xl flex flex-col items-center animate-fade-in">
+            
+            <div class="w-full flex flex-col sm:flex-row justify-between items-start sm:items-end mb-8 gap-4 px-2">
+                <div>
+                    <h2 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 drop-shadow-sm flex items-center gap-2">
+                        <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2.5 2.5 0 00-2.5-2.5H15M9 11l3 3m0 0l3-3m-3 3V8"></path></svg>
+                        Genshin Leaks Live
+                    </h2>
+                    <p class="text-sm text-gray-400 mt-1">Extraído en tiempo real de la comunidad (Anti-AdBlock).</p>
                 </div>
-
-                <!-- Input Zone -->
-                <div class="flex flex-col sm:flex-row gap-3 mb-8 bg-black/20 p-2 rounded-2xl border border-white/5">
-                    <div class="relative flex-1">
-                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <svg class="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 24 24"><path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/></svg>
-                        </div>
-                        <input type="text" id="twitterInput" placeholder="Ej: @GenshinUpdate o el enlace completo" 
-                               class="w-full bg-white/5 border border-transparent rounded-xl py-3 pl-12 pr-4 text-white placeholder-gray-500 focus:outline-none focus:bg-white/10 focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 transition">
-                    </div>
-                    <button onclick="loadTwitterFeed()" class="bg-[#1DA1F2] hover:bg-[#1a8cd8] text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-[#1DA1F2]/20 transition flex justify-center items-center gap-2 whitespace-nowrap">
-                        Cargar Feed
-                    </button>
-                </div>
-
-                <!-- Contenedor del Widget -->
-                <div class="relative w-full rounded-2xl overflow-hidden bg-[#000000]/60 border border-white/10 min-h-[600px] flex justify-center shadow-inner">
-                    
-                    <!-- Estado Inicial / Vacío -->
-                    <div id="twitterEmptyState" class="absolute inset-0 flex flex-col items-center justify-center text-center p-6 z-10">
-                        <div class="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
-                            <svg class="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2.5 2.5 0 00-2.5-2.5H15M9 11l3 3m0 0l3-3m-3 3V8"></path></svg>
-                        </div>
-                        <h3 class="text-lg font-bold text-gray-300 mb-2">Feed Vacío</h3>
-                        <p class="text-sm text-gray-500 max-w-sm">Escribe un usuario de X arriba para cargar su línea de tiempo en tiempo real.</p>
-                        
-                        <div class="mt-6 flex flex-wrap justify-center gap-2">
-                            <span class="text-xs text-gray-600 font-semibold uppercase tracking-wider mb-1 w-full">Sugerencias:</span>
-                            <button onclick="document.getElementById('twitterInput').value='GenshinUpdate'; loadTwitterFeed();" class="text-xs bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-lg border border-white/5 transition text-blue-400">@GenshinUpdate</button>
-                            <button onclick="document.getElementById('twitterInput').value='GenshinImpact'; loadTwitterFeed();" class="text-xs bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-lg border border-white/5 transition text-blue-400">@GenshinImpact</button>
-                            <button onclick="document.getElementById('twitterInput').value='hxg_diluc'; loadTwitterFeed();" class="text-xs bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-lg border border-white/5 transition text-blue-400">@hxg_diluc</button>
-                        </div>
-                    </div>
-
-                    <!-- Div donde Twitter inyecta el Iframe -->
-                    <div id="twitterWidgetRender" class="w-full relative z-20 h-[600px] overflow-y-auto custom-scrollbar bg-transparent">
-                        <!-- El script widgets.js reemplazará el <a> que pondremos aquí -->
-                    </div>
-                </div>
-
+                <button onclick="loadCustomLeaks()" class="bg-blue-600/20 hover:bg-blue-600/40 text-blue-300 border border-blue-500/50 px-5 py-2.5 rounded-xl text-sm font-bold transition flex items-center gap-2 shadow-lg">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                    Actualizar Feed
+                </button>
             </div>
+
+            <!-- Contenedor Grid de Tarjetas -->
+            <div id="leaksGrid" class="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Se llenará dinámicamente -->
+            </div>
+
         </div>
 
     </main>
 
     <script>
-        // ==========================================
-        // LÓGICA DE PESTAÑAS (TABS)
-        // ==========================================
+        // Cambiar pestañas
         function switchTab(tabId) {
-            const trackerTab = document.getElementById('trackerTab');
-            const leaksTab = document.getElementById('leaksTab');
-            const btnTracker = document.getElementById('btnTabTracker');
-            const btnLeaks = document.getElementById('btnTabLeaks');
-
-            // Clases activas / inactivas para botones
-            const activeBtnClasses = "px-6 py-2.5 rounded-xl font-bold transition-all duration-300 bg-white/15 text-white shadow-lg border border-white/10 text-sm md:text-base";
-            const inactiveBtnClasses = "px-6 py-2.5 rounded-xl font-bold transition-all duration-300 text-gray-400 hover:text-white hover:bg-white/5 text-sm md:text-base border border-transparent";
-
-            if (tabId === 'tracker') {
-                trackerTab.classList.remove('hidden');
-                leaksTab.classList.add('hidden');
-                btnTracker.className = activeBtnClasses;
-                btnLeaks.className = inactiveBtnClasses;
-            } else {
-                trackerTab.classList.add('hidden');
-                leaksTab.classList.remove('hidden');
-                btnLeaks.className = activeBtnClasses;
-                btnTracker.className = inactiveBtnClasses;
-            }
+            document.getElementById('trackerTab').classList.toggle('hidden', tabId !== 'tracker');
+            document.getElementById('leaksTab').classList.toggle('hidden', tabId !== 'leaks');
+            
+            const activeClass = "px-6 py-2.5 rounded-xl font-bold transition-all duration-300 bg-white/15 text-white shadow-lg border border-white/10 text-sm md:text-base";
+            const inactiveClass = "px-6 py-2.5 rounded-xl font-bold transition-all duration-300 text-gray-400 hover:text-white hover:bg-white/5 text-sm md:text-base border border-transparent";
+            
+            document.getElementById('btnTabTracker').className = tabId === 'tracker' ? activeClass : inactiveClass;
+            document.getElementById('btnTabLeaks').className = tabId === 'leaks' ? activeClass : inactiveClass;
         }
 
         // ==========================================
-        // LÓGICA DEL WIDGET DE TWITTER
+        // CARGA DE LEAKS (REDDIT API - NATIVO Y SEGURO)
         // ==========================================
-        function loadTwitterFeed() {
-            const inputField = document.getElementById('twitterInput');
-            let inputValue = inputField.value.trim();
-            const widgetContainer = document.getElementById('twitterWidgetRender');
-            const emptyState = document.getElementById('twitterEmptyState');
-
-            if (!inputValue) {
-                alert("Por favor, ingresa un usuario o enlace válido.");
-                return;
-            }
-
-            // Ocultar el estado vacío
-            emptyState.classList.add('hidden');
+        async function loadCustomLeaks() {
+            const grid = document.getElementById('leaksGrid');
             
-            // Limpiar el contenedor actual y mostrar mensaje de carga
-            widgetContainer.innerHTML = `
-                <div id="loadingMessage" class="flex flex-col items-center justify-center h-full text-center p-6 animate-pulse">
-                    <svg class="w-10 h-10 text-[#1DA1F2] animate-spin mb-4" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    <p class="text-blue-400 font-bold mb-2" id="loadingText">Conectando con X...</p>
-                    <p class="text-xs text-gray-500 max-w-xs">Esperando respuesta del servidor de Twitter.</p>
+            // Mostrar animación de carga (Skeleton Loader)
+            grid.innerHTML = Array(6).fill(`
+                <div class="glass-effect rounded-2xl p-5 animate-pulse">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 rounded-full bg-white/10"></div>
+                        <div class="space-y-2 flex-1">
+                            <div class="h-3 w-24 bg-white/10 rounded"></div>
+                            <div class="h-2 w-16 bg-white/10 rounded"></div>
+                        </div>
+                    </div>
+                    <div class="space-y-2 mb-4">
+                        <div class="h-4 w-full bg-white/10 rounded"></div>
+                        <div class="h-4 w-5/6 bg-white/10 rounded"></div>
+                    </div>
+                    <div class="w-full h-40 bg-white/5 rounded-xl"></div>
                 </div>
-            `;
+            `).join('');
 
-            // Limpiar la entrada del usuario
-            let username = inputValue;
-            if (username.startsWith('@')) username = username.substring(1);
-            
-            if (inputValue.includes('twitter.com/') || inputValue.includes('x.com/')) {
-                try {
-                    const urlObj = new URL(inputValue);
-                    const pathParts = urlObj.pathname.split('/').filter(part => part.length > 0);
-                    if (pathParts.length > 0) username = pathParts[0]; 
-                } catch(e) {
-                    const parts = inputValue.split('/');
-                    username = parts[parts.length - 1].split('?')[0]; 
-                }
-            }
+            try {
+                // Obtenemos los últimos 15 posts de r/Genshin_Impact_Leaks
+                const response = await fetch('https://www.reddit.com/r/Genshin_Impact_Leaks/new.json?limit=15');
+                const json = await response.json();
+                
+                grid.innerHTML = ''; // Limpiamos los skeletons
 
-            // Temporizador de seguridad (Timeout) de 6 segundos
-            const timeoutId = setTimeout(() => {
-                const loader = document.getElementById('loadingMessage');
-                if (loader) {
-                    widgetContainer.innerHTML = `
-                        <div class="flex flex-col items-center justify-center h-full text-center p-6 border border-red-500/20 rounded-2xl bg-red-500/5">
-                            <span class="text-4xl mb-3">⚠️</span>
-                            <h3 class="text-red-400 font-bold mb-2">Bloqueo Detectado</h3>
-                            <p class="text-sm text-gray-400 mb-4 max-w-sm">
-                                Chrome ha bloqueado el widget. Esto suele ocurrir al abrir el archivo como <b>file:///</b> o si tienes un bloqueador de anuncios activo.
-                            </p>
-                            <a href="https://x.com/${username}" target="_blank" class="bg-white/10 hover:bg-white/20 px-6 py-2 rounded-xl text-sm font-bold transition flex items-center gap-2">
-                                Abrir @${username} en nueva pestaña <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
-                            </a>
+                json.data.children.forEach(post => {
+                    const data = post.data;
+                    
+                    // Filtrar Megathreads para que no ensucien el feed
+                    if(data.title.includes("Megathread")) return;
+
+                    // Formatear Fecha
+                    const date = new Date(data.created_utc * 1000);
+                    const timeAgo = getTimeAgo(date);
+
+                    // Determinar el Tag de color
+                    let tagClass = "leak-tag";
+                    let tagText = data.link_flair_text || "News";
+                    if(tagText.toLowerCase().includes("questionable")) tagClass += " tag-questionable";
+                    if(tagText.toLowerCase().includes("reliable")) tagClass += " tag-reliable";
+                    if(tagText.toLowerCase().includes("official")) tagClass += " tag-official";
+
+                    // Extraer Imagen si existe (Reddit a veces esconde la alta resolución en preview.images)
+                    let imageUrl = '';
+                    if (data.preview && data.preview.images && data.preview.images[0]) {
+                        // Reddit codifica los '&' como '&amp;', hay que arreglarlo
+                        imageUrl = data.preview.images[0].source.url.replace(/&amp;/g, '&');
+                    } else if (data.url && (data.url.endsWith('.jpg') || data.url.endsWith('.png'))) {
+                        imageUrl = data.url;
+                    }
+
+                    // Construir la tarjeta HTML
+                    const card = document.createElement('a');
+                    card.href = `https://reddit.com${data.permalink}`;
+                    card.target = "_blank";
+                    card.className = "glass-effect rounded-2xl p-5 card-hover cursor-pointer flex flex-col justify-between h-full";
+                    
+                    card.innerHTML = `
+                        <div>
+                            <div class="flex items-start justify-between mb-3 gap-2">
+                                <span class="${tagClass}">${tagText}</span>
+                                <span class="text-xs text-gray-400 font-medium">${timeAgo}</span>
+                            </div>
+                            
+                            <h3 class="text-sm font-bold text-white mb-3 line-clamp-3 leading-snug">
+                                ${data.title}
+                            </h3>
+                            
+                            ${imageUrl ? `
+                                <div class="w-full h-40 rounded-xl overflow-hidden mb-4 border border-white/5">
+                                    <img src="${imageUrl}" alt="Leak image" class="w-full h-full object-cover hover:scale-105 transition duration-500">
+                                </div>
+                            ` : ''}
+                        </div>
+                        
+                        <div class="flex items-center gap-2 mt-auto pt-3 border-t border-white/10">
+                            <div class="w-6 h-6 rounded-full bg-blue-900 flex items-center justify-center text-xs">
+                                👤
+                            </div>
+                            <span class="text-xs text-gray-400">u/${data.author}</span>
+                            
+                            <div class="ml-auto flex items-center gap-1 text-xs text-gray-400">
+                                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.8 2.4z"></path></svg>
+                                ${data.score}
+                            </div>
                         </div>
                     `;
-                }
-            }, 6000);
-
-            // Usar la API oficial para crear el Timeline dinámicamente
-            if (window.twttr && window.twttr.widgets) {
-                window.twttr.widgets.createTimeline(
-                    {
-                        sourceType: "profile",
-                        screenName: username
-                    },
-                    widgetContainer,
-                    {
-                        theme: "dark",
-                        chrome: "transparent nofooter noborders"
-                    }
-                ).then(function (el) {
-                    clearTimeout(timeoutId); // Si carga bien, cancelamos el error
                     
-                    const loader = document.getElementById('loadingMessage');
-                    if (loader) loader.remove();
-
-                    if (!el) {
-                        widgetContainer.innerHTML = `
-                            <div class="flex flex-col items-center justify-center h-full text-center p-6">
-                                <span class="text-4xl mb-2">🚫</span>
-                                <h3 class="text-red-400 font-bold mb-2">Error al cargar</h3>
-                                <p class="text-sm text-gray-400">No se pudo cargar el perfil <b>@${username}</b>. <br>Puede que la cuenta no exista.</p>
-                            </div>
-                        `;
-                    } else {
-                        console.log("Feed cargado correctamente:", username);
-                    }
-                }).catch(function (error) {
-                    clearTimeout(timeoutId);
-                    widgetContainer.innerHTML = `<p class="text-red-500 p-4 text-center">Error de red: ${error.message}</p>`;
+                    grid.appendChild(card);
                 });
-            } else {
-                clearTimeout(timeoutId);
-                widgetContainer.innerHTML = `<p class="text-red-400 p-8 text-center font-bold">❌ El script base de Twitter fue bloqueado por tu navegador.</p>`;
+
+            } catch (error) {
+                console.error("Error cargando leaks:", error);
+                grid.innerHTML = `
+                    <div class="col-span-full flex flex-col items-center justify-center py-10 bg-red-500/10 border border-red-500/20 rounded-2xl">
+                        <span class="text-4xl mb-2">⚠️</span>
+                        <h3 class="text-red-400 font-bold">Error de conexión</h3>
+                        <p class="text-sm text-gray-400">No se pudieron cargar las noticias de Reddit.</p>
+                    </div>
+                `;
             }
         }
+
+        // Función auxiliar para calcular "Hace cuánto tiempo"
+        function getTimeAgo(date) {
+            const seconds = Math.floor((new Date() - date) / 1000);
+            let interval = seconds / 86400;
+            if (interval > 1) return Math.floor(interval) + " días";
+            interval = seconds / 3600;
+            if (interval > 1) return Math.floor(interval) + " h";
+            interval = seconds / 60;
+            if (interval > 1) return Math.floor(interval) + " min";
+            return Math.floor(seconds) + " seg";
+        }
+
+        // Cargar los leaks automáticamente al iniciar la app
+        window.addEventListener('DOMContentLoaded', () => {
+            loadCustomLeaks();
+        });
+
     </script>
 </body>
 </html>
