@@ -86,6 +86,13 @@
             color: #fff;
             box-shadow: 0 0 15px rgba(42, 171, 238, 0.2);
         }
+
+        .truncate-2-lines {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col relative text-gray-100 overflow-x-hidden">
@@ -115,6 +122,7 @@
 
     <main class="flex-grow container mx-auto px-4 py-4 relative z-10 flex flex-col items-center pb-24">
         
+        <!-- Tab: Calculator -->
         <div id="trackerTab" class="hidden w-full flex flex-col items-center animate-fade-in">
             <div class="glass-effect rounded-3xl p-8 mb-6 text-center border-l-4 border-blue-500 max-w-2xl">
                 <h2 class="text-xl font-bold text-white mb-2">Calculadora Principal</h2>
@@ -122,6 +130,7 @@
             </div>
         </div>
 
+        <!-- Tab: Reddit Leaks -->
         <div id="leaksTab" class="hidden w-full max-w-6xl flex flex-col items-center animate-fade-in">
             <div class="w-full flex flex-col sm:flex-row justify-between items-start sm:items-end mb-8 gap-4 px-2">
                 <div>
@@ -139,6 +148,7 @@
             <div id="leaksGrid" class="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </div>
 
+        <!-- Tab: Telegram Feed -->
         <div id="telegramTab" class="hidden w-full max-w-6xl flex flex-col items-center animate-fade-in">
             <div class="w-full flex flex-col sm:flex-row justify-between items-start sm:items-end mb-8 gap-4 px-2">
                 <div>
@@ -171,6 +181,7 @@
 
     </main>
 
+    <!-- Unified Modal -->
     <div id="postModal" class="fixed inset-0 z-[100] hidden opacity-0 transition-opacity duration-300 flex items-center justify-center p-4">
         <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closePostModal()"></div>
         <div id="postModalContent" class="relative w-full max-w-3xl max-h-[90vh] glass-effect border border-white/20 rounded-3xl shadow-2xl flex flex-col overflow-hidden transition-transform duration-300 scale-95">
@@ -213,26 +224,15 @@
             });
         }
 
-        // CARGA DE REDDIT (CON FALLBACK DE PROXY)
+        // REDDIT - Revertido a Fetch Directo
         async function loadCustomLeaks() {
             const grid = document.getElementById('leaksGrid');
             grid.innerHTML = Array(6).fill(`<div class="glass-effect rounded-2xl p-5 animate-pulse"><div class="h-4 w-24 bg-white/10 rounded mb-4"></div><div class="h-10 w-full bg-white/10 rounded mb-4"></div><div class="h-40 w-full bg-white/10 rounded"></div></div>`).join('');
             
             try {
-                const redditUrl = 'https://www.reddit.com/r/Genshin_Impact_Leaks/new.json?limit=15';
-                
-                // Intento 1: corsproxy.io (Más rápido para Reddit)
-                let response = await fetch(`https://corsproxy.io/?${encodeURIComponent(redditUrl)}`);
-                let json;
-
-                if (response.ok) {
-                    json = await response.json();
-                } else {
-                    // Intento 2: AllOrigins (Respaldo)
-                    const altResponse = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(redditUrl)}&_=${Date.now()}`);
-                    const altData = await altResponse.json();
-                    json = JSON.parse(altData.contents);
-                }
+                // Fetch directo como funcionaba antes
+                const response = await fetch('https://www.reddit.com/r/Genshin_Impact_Leaks/new.json?limit=15');
+                const json = await response.json();
 
                 grid.innerHTML = ''; 
                 window.loadedRedditPosts = [];
@@ -269,7 +269,7 @@
                 });
             } catch (e) { 
                 console.error("Error Reddit:", e);
-                grid.innerHTML = `<div class="col-span-full text-center py-10 text-red-400">Error cargando Reddit. Intenta refrescar de nuevo.</div>`;
+                grid.innerHTML = `<div class="col-span-full text-center py-10 text-red-400">Error cargando noticias.</div>`;
             }
         }
 
@@ -298,7 +298,6 @@
 
             try {
                 const url = `https://t.me/s/${channelName}`;
-                // Agregamos un timestamp para evitar cache del proxy
                 const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}&_=${Date.now()}`);
                 const data = await response.json();
                 
@@ -313,15 +312,16 @@
 
                 if (messages.length === 0) {
                     countLabel.textContent = "No hay mensajes públicos.";
-                    grid.innerHTML = `<div class="col-span-full text-center py-10 text-red-400 font-bold">❌ El canal es privado o no existe.</div>`;
+                    grid.innerHTML = `<div class="col-span-full text-center py-10 text-red-400 font-bold">❌ Canal privado o no existe.</div>`;
                     return;
                 }
 
-                const recentMessages = messages.slice(0, 25);
+                const limit = Math.min(messages.length, 25);
+                const recentMessages = messages.slice(0, limit);
                 
                 recentMessages.forEach(msg => {
                     const textEl = msg.querySelector('.tgme_widget_message_text');
-                    const cleanHtml = textEl ? textEl.innerHTML : '<i>Adjunto multimedia</i>';
+                    const cleanHtml = textEl ? textEl.innerHTML : '<i>Contenido multimedia</i>';
                     const photos = msg.querySelectorAll('.tgme_widget_message_photo_wrap');
                     const videos = msg.querySelectorAll('.tgme_widget_message_video_thumb');
                     const media = [];
@@ -359,7 +359,7 @@
                         <div class="text-sm text-gray-200 mb-3 line-clamp-4 leading-snug flex-1">${cleanHtml.replace(/<[^>]*>?/gm, '')}</div>
                         ${media.length > 0 ? `
                             <div class="w-full h-40 rounded-xl overflow-hidden mb-2 border border-white/5 relative bg-black/20">
-                                <img src="${media[0].url}" class="w-full h-full object-cover" loading="lazy">
+                                <img src="${media[0].url}" class="w-full h-full object-cover">
                                 ${media.length > 1 ? `<div class="absolute bottom-2 right-2 bg-black/70 px-2 py-0.5 rounded text-[10px] font-bold">+${media.length - 1}</div>` : ''}
                             </div>
                         ` : ''}
