@@ -3,535 +3,907 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Genshin Impact Primogem Tracker - v1.2 Unified</title>
+    <title>Genshin Impact Primogem Tracker - v1.2 release</title>
 
     <meta name="theme-color" content="#0b0f1a">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Genshin Tracker">
+    <meta name="apple-mobile-web-app-title" content="Genshin Tracker v1.2">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
-    
     <style>
         body {
             font-family: 'Inter', sans-serif;
             background-color: #0b0f1a;
             color: #f1f5f9;
+            /* BACKGROUND IMAGE CONFIGURATION */
             background-image: url('fondo.png');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
             background-repeat: no-repeat;
+            min-height: 100vh;
         }
+
+        /* Dark overlay for contrast */
         body::before {
             content: "";
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: radial-gradient(circle at 50% 0%, #1a2235 0%, #0b0f1a 80%);
-            z-index: -2;
+            background: rgba(11, 15, 26, 0.7); 
+            z-index: -1;
         }
 
-        /* Estilos Integrados del Sandbox */
-        .glass-effect {
-            background: rgba(15, 23, 42, 0.5);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        .card {
+            background-color: rgba(22, 30, 45, 0.85);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(45, 55, 72, 0.5);
+            border-radius: 12px;
+            padding: 1.25rem;
+            transition: all 0.2s ease;
         }
-        .card-hover {
-            transition: all 0.3s ease;
-        }
-        .card-hover:hover {
-            transform: translateY(-4px);
-            background: rgba(30, 41, 59, 0.7);
-            border-color: rgba(96, 165, 250, 0.4);
-            box-shadow: 0 10px 30px -10px rgba(59, 130, 246, 0.3);
-        }
-        .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .leak-tag {
-            background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%);
-            color: white;
-            font-size: 0.65rem;
-            font-weight: 800;
-            padding: 2px 8px;
+        .card:hover { border-color: #3b82f6; box-shadow: 0 0 15px rgba(59, 130, 246, 0.2); }
+
+        input[type="number"], input[type="text"], input[type="date"], select {
+            background-color: rgba(31, 41, 55, 0.9);
+            border: 1px solid #374151;
+            color: #ffffff;
             border-radius: 6px;
+            padding: 0.35rem 0.6rem;
+            width: 100%;
+            font-size: 0.9rem;
+            font-weight: 700;
+            outline: none;
+            color-scheme: dark;
+        }
+        input:focus, select:focus { border-color: #3b82f6; }
+
+        .progress-check {
+            width: 1.15rem;
+            height: 1.15rem;
+            accent-color: #10b981;
+            cursor: pointer;
+        }
+
+        .section-title {
+            font-size: 0.8rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
-        .tag-reliable { background: linear-gradient(90deg, #10b981 0%, #059669 100%); }
-        .tag-questionable { background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%); }
 
-        .tele-quick-btn.active {
-            background-color: rgba(42, 171, 238, 0.25);
-            border-color: rgba(42, 171, 238, 0.6);
-            color: #fff;
-            box-shadow: 0 0 15px rgba(42, 171, 238, 0.2);
+        .progress-bar-container {
+            background-color: #1f2937;
+            border-radius: 999px;
+            height: 12px;
+            width: 100%;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            background: linear-gradient(90deg, #10b981, #34d399);
+            height: 100%;
+            transition: width 0.4s ease-out;
         }
 
-        /* Scrollbar personalizado */
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 8px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 8px; }
+        .gem-glow { text-shadow: 0 0 12px rgba(255, 255, 255, 0.3); }
 
-        input[type="number"]::-webkit-inner-spin-button, 
-        input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        .lantern-rite-special {
+            background: linear-gradient(45deg, #7c2d12, #450a0a) !important;
+            border: 1px solid #ea580c !important;
+        }
+
+        .status-fieldset {
+            padding: 0.5rem 1.25rem 1.25rem 1.25rem;
+            border-radius: 20px;
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+        .status-legend {
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            font-size: 1.1rem;
+            padding: 0.2rem 1.5rem;
+            border-radius: 9999px; 
+            margin: 0 auto;
+        }
+
+        .today-group { border: 2px solid rgba(74, 222, 128, 0.4); background: rgba(74, 222, 128, 0.05); }
+        .today-legend { color: #4ade80; border: 2px solid rgba(74, 222, 128, 0.4); background-color: #0b0f1a; }
+
+        .version-group { border: 2px solid rgba(96, 165, 250, 0.4); background: rgba(96, 165, 250, 0.05); }
+        .version-legend { color: #60a5fa; border: 2px solid rgba(96, 165, 250, 0.4); background-color: #0b0f1a; }
+
+        .dw-icon {
+            display: inline-block;
+            vertical-align: middle;
+            width: 1.8rem;
+            height: 1.8rem;
+            filter: drop-shadow(0 0 5px rgba(132, 196, 240, 0.4));
+        }
+        
+        .btn-add-pink {
+            flex: 1;
+            background-color: rgba(236, 72, 153, 0.15);
+            border: 1px solid rgba(236, 72, 153, 0.3);
+            color: #f472b6;
+            font-size: 0.75rem;
+            font-weight: 900;
+            padding: 0.25rem 0;
+            border-radius: 4px;
+        }
+
+        .btn-sub-red {
+            flex: 1;
+            background-color: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #f87171;
+            font-size: 0.75rem;
+            font-weight: 900;
+            padding: 0.25rem 0;
+            border-radius: 4px;
+        }
+
+        .btn-inline-r2 {
+            background-color: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #f87171;
+            width: 26px;
+            height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 900;
+            transition: all 0.2s;
+            flex-shrink: 0;
+            cursor: pointer;
+            z-index: 10;
+        }
+        .btn-inline-r2.active {
+            background-color: rgba(16, 185, 129, 0.15);
+            border-color: rgba(16, 185, 129, 0.3);
+            color: #10b981;
+        }
+        .btn-inline-r2:hover { transform: scale(1.1); filter: brightness(1.2); }
+
+        .btn-version-action {
+            flex: 1;
+            font-size: 0.65rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            padding: 0.4rem 0;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            transition: all 0.2s;
+        }
+
+        .btn-spend-action {
+            font-size: 11px;
+            font-weight: 900;
+            padding: 5px 0;
+            border-radius: 4px;
+            border-width: 1px;
+            transition: all 0.2s;
+        }
+
+        .linked-indicator {
+            font-size: 8px;
+            color: #3b82f6;
+            font-weight: 900;
+            text-transform: uppercase;
+            margin-top: 4px;
+            display: block;
+        }
+
+        .footer-bar {
+            background-color: rgba(11, 15, 26, 0.9);
+            backdrop-filter: blur(12px);
+        }
     </style>
 </head>
-<body class="min-h-screen flex flex-col relative overflow-x-hidden">
+<body class="p-4 md:p-6 lg:p-8">
 
-    <!-- Loading Overlay Original -->
-    <div id="loadingOverlay" class="fixed inset-0 z-[200] bg-[#0b0f1a] flex flex-col items-center justify-center transition-opacity duration-500">
-        <div class="w-16 h-16 border-4 border-blue-500/20 border-t-blue-500 rounded-full animate-spin mb-4"></div>
-        <p class="text-blue-400 font-bold animate-pulse">Cargando datos...</p>
+    <div id="loadingOverlay" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-[100] hidden flex items-center justify-center">
+        <div class="bg-slate-900 border border-blue-500/30 p-8 rounded-2xl shadow-2xl text-center max-w-sm">
+            <div class="w-16 h-16 border-4 border-blue-500/20 border-t-blue-500 rounded-full animate-spin mx-auto mb-4"></div>
+            <h3 class="text-xl font-bold text-white mb-2">Sincronizando...</h3>
+            <p id="loadingMsg" class="text-xs text-slate-400">Accediendo a la base de datos de Dani Welsh</p>
+        </div>
     </div>
 
-    <!-- Header y Navegación -->
-    <header class="w-full pt-6 pb-2 relative z-50">
-        <div class="container mx-auto px-4 flex flex-col items-center">
-            <div class="flex items-center gap-3 mb-2">
-                <h1 class="text-2xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-300 via-purple-300 to-indigo-300 tracking-tight drop-shadow-lg">
-                    Genshin Tracker
-                </h1>
-                <div id="userBadge" class="hidden glass-effect px-3 py-1 rounded-full border border-white/10 flex items-center gap-2">
-                    <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                    <span id="userIdDisplay" class="text-[10px] font-mono text-gray-400">ID: ...</span>
+    <div id="customUIModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-[200] hidden flex items-center justify-center opacity-0 transition-opacity duration-300">
+        <div class="bg-slate-900 border border-indigo-500/30 p-6 rounded-2xl shadow-2xl text-center max-w-sm w-full mx-4 transform scale-95 transition-transform duration-300" id="customModalContent">
+            <h3 id="modalTitle" class="text-lg font-black text-white mb-3">Título</h3>
+            <p id="modalMessage" class="text-sm text-slate-400 mb-4 hidden whitespace-pre-wrap">Mensaje</p>
+            <input type="text" id="modalInput" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-white mb-5 hidden text-sm font-bold focus:border-indigo-500 outline-none">
+            <div class="flex gap-3 justify-center">
+                <button id="modalBtnCancel" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg font-bold text-xs uppercase hidden">Cancelar</button>
+                <button id="modalBtnConfirm" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-bold text-xs uppercase shadow-lg shadow-indigo-500/30">Aceptar</button>
+            </div>
+        </div>
+    </div>
+
+    <input type="file" id="imageInput" accept="image/*" class="hidden" onchange="handleImageAnalysis(this)">
+
+    <div class="max-w-7xl mx-auto">
+        <header class="mb-4 flex flex-col md:flex-row justify-between items-center gap-10 text-center md:text-left py-6">
+            <div>
+                <div class="mb-4">
+                    <span class="inline-block pr-3 text-2xl md:text-4xl lg:text-5xl font-black italic tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-500 leading-[1.3]">
+                        Created by Dani Welsh
+                    </span>
                 </div>
+                <h1 class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-500 leading-tight flex items-center gap-3 justify-center md:justify-start">
+                    Genshin Tracker v1.2 release
+                    <button id="authBtn" onclick="toggleAuth()" class="text-[10px] text-slate-300 font-bold border border-slate-700 bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-full whitespace-nowrap transition-colors flex items-center gap-1.5 shadow-lg cursor-pointer" style="text-shadow: none;">
+                        <span id="authIcon">☁️</span> <span id="authLabel">Local</span>
+                    </button>
+                </h1>
             </div>
 
-            <!-- Navegación por Pestañas -->
-            <nav class="flex gap-2 bg-black/40 p-1 rounded-2xl backdrop-blur-md border border-white/10 shadow-xl mt-4">
-                <button id="btnTabTracker" onclick="switchTab('tracker')" class="px-5 py-2 rounded-xl font-bold transition-all duration-300 bg-white/15 text-white shadow-lg border border-white/10 text-xs md:text-sm">
-                    Calculadora
-                </button>
-                <button id="btnTabLeaks" onclick="switchTab('leaks')" class="px-5 py-2 rounded-xl font-bold transition-all duration-300 text-gray-400 hover:text-white hover:bg-white/5 text-xs md:text-sm border border-transparent">
-                    Leaks (Reddit)
-                </button>
-                <button id="btnTabTelegram" onclick="switchTab('telegram')" class="px-5 py-2 rounded-xl font-bold transition-all duration-300 text-gray-400 hover:text-white hover:bg-white/5 text-xs md:text-sm border border-transparent">
-                    Telegram
-                </button>
-            </nav>
-        </div>
-    </header>
+            <div class="flex items-center gap-4">
+                <div class="card py-2 px-6 flex items-center gap-4 border-none shadow-xl">
+                    <div class="text-right">
+                        <div class="text-[15px] text-slate-400 uppercase font-bold">Potencial Versión</div>
+                        <div class="text-[27px] font-bold text-indigo-400 flex items-center justify-end gap-1">
+                            <span id="versionPotentialWishes">0</span>
+                            <img src="deseo.png" class="dw-icon w-[30px] h-[30px]" alt="Deseo">
+                        </div>
+                    </div>
+                </div>
 
-    <main class="flex-grow container mx-auto px-4 py-4 relative z-10">
-        
-        <!-- PESTAÑA 1: CALCULADORA ORIGINAL -->
-        <div id="trackerTab" class="w-full animate-fade-in">
-            <div class="max-w-4xl mx-auto space-y-6">
-                <!-- Selector de Versión -->
-                <div class="glass-effect rounded-3xl p-4 md:p-6 flex flex-col md:flex-row items-center justify-between gap-4 border-l-4 border-blue-500">
+                <div class="card py-2 px-4 flex items-center gap-4 border-none shadow-xl">
+                    <div class="text-right">
+                        <div class="text-[10px] text-slate-400 uppercase font-bold">Progreso</div>
+                        <div class="text-lg font-bold text-green-400"><span id="percentLabel">0</span>%</div>
+                    </div>
+                    <div class="w-32 md:w-48">
+                        <div class="progress-bar-container">
+                            <div id="progressBar" class="progress-bar-fill" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="space-y-8">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 mb-6">
+                <!-- Game Version Card -->
+                <div class="card border-blue-500/30 lg:col-span-1 flex flex-col justify-between">
                     <div>
-                        <label class="block text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-1">Versión del Juego</label>
-                        <select id="gameVersion" onchange="handleVersionChange()" class="bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white font-bold focus:outline-none focus:border-blue-500 transition cursor-pointer text-lg">
-                            <option value="6.3" class="bg-[#1a2235]">Versión 6.3 (Actual)</option>
+                        <label class="block text-[10px] text-blue-400 font-bold uppercase mb-2 text-center">Versión del Juego</label>
+                        <select id="gameVersion" class="text-sm font-bold bg-slate-800 text-center mb-3" onchange="checkVersionSelect()">
+                            <option value="6.3">v6.3: Rito Linterna</option>
+                            <option value="upload" class="text-blue-400 font-black">📷 Analizar Imagen...</option>
                         </select>
                     </div>
-                    <div class="text-right">
-                        <span id="totalDisplay" class="text-3xl md:text-4xl font-black text-white">0</span>
-                        <span class="text-blue-400 font-bold ml-1">Protogemas</span>
+                    <div class="space-y-2">
+                        <div class="flex gap-2">
+                            <button onclick="addNewVersionManually()" class="btn-version-action bg-indigo-600 hover:bg-indigo-500 text-white" title="Nueva Versión">
+                                <span>➕</span>
+                            </button>
+                            <button onclick="renameCurrentVersion()" class="btn-version-action bg-slate-700 hover:bg-slate-600 text-slate-200" title="Editar Nombre">
+                                <span>✏️</span>
+                            </button>
+                            <button onclick="deleteCurrentVersion()" class="btn-version-action bg-red-600/20 hover:bg-red-600/40 text-red-400 border border-red-600/30" title="Eliminar Versión">
+                                <span>🗑️</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Grid de Categorías -->
-                <div id="categoriesGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- Las categorías se generan vía JS -->
+                <div class="card border-green-500/30 text-center lg:col-span-1">
+                    <label class="block text-[10px] text-green-400 font-bold uppercase mb-2">Protogemas Iniciales</label>
+                    <input type="number" id="inventoryGems" value="0" class="text-xl font-black text-center text-green-400" oninput="calculate()">
+                    <span id="linkedIndicator" class="linked-indicator hidden">🔗 Sincronizado</span>
                 </div>
-
-                <!-- Footer de la Calculadora -->
-                <div class="glass-effect rounded-3xl p-6 text-center border-t border-white/5">
-                    <p class="text-gray-400 text-xs italic">Los datos se guardan automáticamente en tu dispositivo y en la nube.</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- PESTAÑA 2: REDDIT LEAKS -->
-        <div id="leaksTab" class="hidden w-full max-w-6xl mx-auto flex flex-col items-center animate-fade-in">
-            <div class="w-full flex justify-between items-end mb-8 px-2">
-                <h2 class="text-2xl font-black text-blue-400 flex items-center gap-2">Reddit Feed</h2>
-                <button onclick="loadCustomLeaks()" class="bg-blue-600/20 text-blue-300 border border-blue-500/50 px-5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 shadow-lg">
-                    Actualizar
-                </button>
-            </div>
-            <div id="leaksGrid" class="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-        </div>
-
-        <!-- PESTAÑA 3: TELEGRAM FEED -->
-        <div id="telegramTab" class="hidden w-full max-w-6xl mx-auto flex flex-col items-center animate-fade-in">
-            <div class="w-full flex flex-col sm:flex-row justify-between items-start sm:items-end mb-8 gap-4 px-2">
-                <div>
-                    <h2 class="text-2xl font-black text-[#2AABEE]">Telegram Feed</h2>
-                    <p class="text-xs text-gray-400 mt-1 italic" id="telegramCount">Cargando...</p>
-                </div>
-                <div class="flex flex-col gap-3 w-full sm:w-auto">
-                    <div class="flex gap-2">
-                        <button onclick="quickSwitchTelegram('team_mew')" class="tele-quick-btn active glass-effect flex-1 sm:flex-none px-4 py-1.5 rounded-lg text-xs font-bold transition-all border border-white/10" data-channel="team_mew">@team_mew</button>
-                        <button onclick="quickSwitchTelegram('hiragara_leaks')" class="tele-quick-btn glass-effect flex-1 sm:flex-none px-4 py-1.5 rounded-lg text-xs font-bold transition-all border border-white/10" data-channel="hiragara_leaks">@hiragara_leaks</button>
-                    </div>
-                    <div class="flex gap-2">
-                        <input type="text" id="telegramInput" value="team_mew" class="bg-white/5 border border-white/10 rounded-xl py-2 px-3 text-white text-sm focus:outline-none focus:border-[#2AABEE]/50 transition w-full">
-                        <button onclick="loadTelegramFeed()" class="bg-[#2AABEE]/20 hover:bg-[#2AABEE]/40 text-[#2AABEE] border border-[#2AABEE]/50 px-4 py-2 rounded-xl text-xs font-bold transition">Ir</button>
+                <div class="card border-pink-500/30 text-center lg:col-span-1">
+                    <label class="block text-[10px] text-pink-300 font-bold uppercase mb-2">Deseos Ganados</label>
+                    <input type="number" id="manualWishes" value="0" class="text-xl font-black text-center text-pink-400 mb-2" oninput="calculate()">
+                    <div class="flex gap-1">
+                        <button onclick="addManualWishes(-1)" class="btn-sub-red">-1</button>
+                        <button onclick="addManualWishes(1)" class="btn-add-pink">+1</button>
+                        <button onclick="addManualWishes(10)" class="btn-add-pink">+10</button>
                     </div>
                 </div>
-            </div>
-            <div id="telegramGrid" class="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-        </div>
-
-    </main>
-
-    <!-- Modal para Detalles de Leaks -->
-    <div id="postModal" class="fixed inset-0 z-[100] hidden opacity-0 transition-opacity duration-300 flex items-center justify-center p-4">
-        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closePostModal()"></div>
-        <div id="postModalContent" class="relative w-full max-w-3xl max-h-[90vh] glass-effect border border-white/20 rounded-3xl overflow-hidden transition-transform duration-300 scale-95 flex flex-col">
-            <div class="p-5 md:p-6 border-b border-white/10 flex justify-between items-start bg-white/5">
-                <div class="pr-4 flex-1">
-                    <div id="modalMeta" class="text-[10px] text-gray-400 font-bold uppercase mb-1"></div>
-                    <h3 id="modalTitle" class="font-bold text-white text-lg md:text-xl leading-tight">Cargando...</h3>
+                
+                <!-- Pulls Realized Card -->
+                <div class="card border-red-500/30 text-center lg:col-span-1 p-3 flex flex-col justify-center">
+                    <label class="block text-[11px] text-red-400 font-bold uppercase mb-2">💸 Tiradas Realizadas</label>
+                    <div class="flex flex-col gap-3">
+                        <div class="space-y-1">
+                            <span class="text-[9px] text-green-400 font-black uppercase">Con Gemas</span>
+                            <div class="flex items-center gap-2">
+                                <input type="number" id="spentGemsWishes" value="0" class="text-lg font-black text-center text-green-400 bg-slate-900 border-green-500/20" oninput="calculate()">
+                                <div class="flex flex-col gap-1 w-14">
+                                    <button onclick="addSpentGemsWishes(1)" class="btn-spend-action bg-green-500/10 border-green-500/30 text-green-400">+1</button>
+                                    <button onclick="addSpentGemsWishes(10)" class="btn-spend-action bg-green-500/10 border-green-500/30 text-green-400">+10</button>
+                                    <button onclick="addSpentGemsWishes(-1)" class="btn-spend-action bg-red-500/10 border-red-500/30 text-red-400">-1</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="h-px bg-slate-700/50 w-full"></div>
+                        <div class="space-y-1">
+                            <span class="text-[9px] text-pink-400 font-black uppercase">Con Deseos</span>
+                            <div class="flex items-center gap-2">
+                                <input type="number" id="spentWishes" value="0" class="text-lg font-black text-center text-pink-400 bg-slate-900 border-pink-500/20" oninput="calculate()">
+                                <div class="flex flex-col gap-1 w-14">
+                                    <button onclick="addSpentWishes(1)" class="btn-spend-action bg-pink-500/10 border-pink-500/30 text-pink-400">+1</button>
+                                    <button onclick="addSpentWishes(10)" class="btn-spend-action bg-pink-500/10 border-pink-500/30 text-pink-400">+10</button>
+                                    <button onclick="addSpentWishes(-1)" class="btn-spend-action bg-red-500/10 border-red-500/30 text-red-400">-1</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <button onclick="closePostModal()" class="text-gray-400 hover:text-white p-2 hover:bg-white/10 rounded-xl transition">✕</button>
+
+                <div class="card border-purple-500/40 lg:col-span-2 grid grid-cols-2 gap-4">
+                    <div class="flex flex-col justify-between text-center">
+                        <label class="block text-[10px] text-purple-400 font-bold uppercase mb-1">Pity Actual</label>
+                        <div class="text-3xl font-black text-purple-400" id="currentPityDisplay">0</div>
+                        <input type="text" id="characterName" placeholder="Nombre..." class="text-[10px] py-1 px-2 mt-2 bg-slate-900 border-purple-500/20">
+                        <div class="flex flex-col gap-1 mt-2">
+                            <button onclick="recordCharacter()" class="bg-gradient-to-r from-purple-500 to-indigo-600 text-white font-black text-[10px] py-1.5 rounded shadow-lg uppercase">¡Conseguido!</button>
+                            <button onclick="undoCharacterRecord()" class="bg-slate-800 hover:bg-slate-700 text-slate-400 font-black text-[9px] py-1 rounded uppercase border border-slate-700">Deshacer</button>
+                        </div>
+                    </div>
+                    <div class="border-l border-slate-700 pl-4 flex flex-col h-[100px] overflow-hidden">
+                        <label class="block text-[9px] text-slate-500 uppercase font-black mb-2 text-center">Historial</label>
+                        <div id="characterHistory" class="space-y-2 flex-1 overflow-y-auto pr-1"></div>
+                    </div>
+                </div>
             </div>
-            <div id="modalBody" class="p-5 md:p-6 overflow-y-auto custom-scrollbar flex-1 text-gray-200"></div>
-            <div class="p-4 border-t border-white/10 bg-black/20 flex justify-end">
-                <a id="modalSourceLink" href="#" target="_blank" class="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded-xl font-bold transition text-xs">Ver Original</a>
+
+            <!-- Dynamic grid bottom -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-96 items-start auto-rows-min">
+                <section class="card h-fit border-yellow-500/30">
+                    <h2 class="section-title text-yellow-400">📅 Fijos y Diarios</h2>
+                    <div class="space-y-4">
+                        <div class="p-3 bg-slate-900/40 rounded-lg flex items-center justify-between gap-3 border border-slate-700/50">
+                            <label class="text-[10px] text-slate-500 uppercase font-black">Registro</label>
+                            <input type="date" id="recordDate" class="text-green-400 font-bold w-auto bg-slate-800 text-center" oninput="calculate()">
+                        </div>
+                        <div class="p-3 bg-slate-900/40 rounded-lg space-y-3">
+                            <label class="block text-[10px] text-slate-500 uppercase font-black">Encargos Diarios</label>
+                            <div class="flex items-center justify-between gap-2">
+                                <input type="number" id="daysDone" value="0" class="text-green-400 text-center" oninput="calculate()">
+                                <div class="text-slate-600 font-bold">/</div>
+                                <input type="number" id="daysTotal" value="42" class="text-slate-100 text-center" oninput="calculate()">
+                            </div>
+                        </div>
+                        <div class="p-3 bg-slate-900/40 rounded-lg space-y-2">
+                            <label class="flex items-center gap-3 cursor-pointer text-sm hover:text-white"><input type="checkbox" id="welkin" onchange="calculate()"> Bendición Lunar</label>
+                            <label class="flex items-center gap-3 cursor-pointer text-sm hover:text-white"><input type="checkbox" id="battlepass" onchange="calculate()"> Pase de Batalla</label>
+                        </div>
+                    </div>
+                </section>
+
+                <div id="customCardsContainer" class="contents"></div>
+
+                <section id="lanternRiteCard" class="card lantern-rite-special h-fit hidden">
+                    <h2 class="section-title text-orange-200">🏮 Rito de la Linterna</h2>
+                    <div class="space-y-3">
+                        <label class="flex items-center gap-3 cursor-pointer text-sm font-bold"><input type="checkbox" id="lanternLogin" onchange="calculate()"> 10 Deseos (Login)</label>
+                        <label class="flex items-center gap-3 cursor-pointer text-sm font-bold"><input type="checkbox" id="lanternMail" onchange="calculate()"> 1600 Gemas (Correo)</label>
+                        <div class="p-2 bg-orange-950/40 rounded border border-orange-500/20 flex items-center gap-3">
+                            <input type="checkbox" id="check_lantern_bonus" onchange="calculate()">
+                            <div class="flex-1">
+                                <label class="text-[9px] text-orange-200 uppercase font-black">Extra Festivo (Protogemas)</label>
+                                <input type="number" id="lanternBonus" value="300" oninput="calculate()" class="bg-orange-900/30 border-orange-400 text-xs text-orange-100 font-black">
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+
+        <!-- Fixed Footer -->
+        <div class="fixed bottom-0 left-0 right-0 p-4 pb-6 footer-bar border-t border-slate-700 z-50 shadow-2xl overflow-x-auto">
+            <div class="max-w-7xl mx-auto flex justify-center items-center gap-6 min-w-[1000px]">
+                <fieldset class="status-fieldset today-group">
+                    <legend class="status-legend today-legend">Hoy</legend>
+                    <div class="flex flex-col items-center bg-white/5 px-5 py-2 rounded-xl border-2 border-slate-300 min-w-[150px]">
+                        <div class="text-[9px] text-white font-black mb-1">Gemas Totales</div>
+                        <div class="flex items-baseline gap-2">
+                            <span id="earnedGems" class="text-2xl font-black text-white gem-glow">0</span>
+                            <span class="text-[20px] text-white/70 ml-1">(<span id="earnedWishesNum">0</span> <img src="deseo.png" class="dw-icon" alt="Deseo">)</span>
+                        </div>
+                    </div>
+                    <div class="flex flex-col items-center bg-green-400/10 px-6 py-2 rounded-xl border-2 border-green-400 min-w-[260px]">
+                        <div class="text-[10px] text-green-400 font-black mb-1">Saldo Actual</div>
+                        <div class="flex items-center gap-4 w-full justify-center">
+                            <div class="flex flex-col items-center">
+                                <span id="currentBalanceGems" class="text-2xl font-black text-green-400">0</span>
+                                <span class="text-[9px] uppercase font-black text-green-500">Gemas</span>
+                            </div>
+                            <div class="h-8 w-px bg-green-500/30"></div>
+                            <div class="flex flex-col items-center">
+                                <span id="currentBalanceWishes" class="text-2xl font-black text-green-400">0</span>
+                                <span class="text-[9px] uppercase font-black text-green-500">Deseos</span>
+                            </div>
+                            <div class="h-8 w-px bg-green-500/30"></div>
+                            <div class="flex flex-col items-center">
+                                <span id="currentBalanceLabel" class="text-2xl font-black text-white">0</span>
+                                <span class="text-[9px] uppercase font-black text-green-500">Total</span>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+                <div class="flex flex-col items-center bg-yellow-500/5 px-6 py-2 rounded-xl border-2 border-yellow-600 min-w-[150px]">
+                    <div class="text-[9px] text-yellow-300 font-black mb-1">Restante</div>
+                    <div class="flex items-baseline gap-2">
+                        <span id="remainingToGet" class="text-2xl font-black text-yellow-300">0</span> <img src="deseo.png" class="dw-icon ml-1 opacity-80" alt="Deseo">
+                    </div>
+                </div>
+                <fieldset class="status-fieldset version-group">
+                    <legend class="status-legend version-legend">Al final</legend>
+                    <div class="flex flex-col items-center bg-green-500/5 px-5 py-2 rounded-xl border-2 border-green-600 min-w-[150px]">
+                        <div class="text-[9px] text-green-300 font-black mb-1">Saldo Final</div>
+                        <span id="totalFinalWishes" class="text-2xl font-black text-green-300">0</span>
+                    </div>
+                    <div class="flex flex-col items-center bg-purple-500/5 px-5 py-2 rounded-xl border-2 border-purple-600 min-w-[150px]">
+                        <div class="text-[9px] text-purple-300 font-black mb-1">Total Máximo</div>
+                        <span id="totalPotentialWishes" class="text-2xl font-black text-purple-300">0</span>
+                    </div>
+                </fieldset>
             </div>
         </div>
     </div>
 
-    <!-- SCRIPTS INTEGRADOS -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const firebaseConfig = JSON.parse(__firebase_config);
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'genshin-tracker-v1';
-
-        // VARIABLES GLOBALES DE LA CALCULADORA
-        let currentUserId = null;
-        let isAppReady = false;
-        let initialSyncDone = false;
-        let customVersions = {}; 
-        let versionProgress = {};
+        const API_KEY_GEMINI = "AIzaSyBWGDoRrZ-cIzkZBT52QuXTb_yOnPVOGrM"; 
         
-        const categories = [
-            { id: 'daily', name: 'Diarias y Eventos', items: [
-                { id: 'commissions', name: 'Encargos Diarios', value: 60, type: 'daily' },
-                { id: 'welkin', name: 'Bendición Lunar', value: 90, type: 'daily' },
-                { id: 'events', name: 'Eventos de Versión', value: 2260, type: 'fixed' },
-                { id: 'web_events', name: 'Eventos Web / Check-in', value: 200, type: 'fixed' }
-            ]},
-            { id: 'exploration', name: 'Exploración y Misiones', items: [
-                { id: 'abyss', name: 'Espiral del Abismo', value: 800, type: 'fixed' },
-                { id: 'theater', name: 'Teatro Imaginario', value: 620, type: 'fixed' },
-                { id: 'exploration_new', name: 'Nuevas Zonas / Misiones', value: 1500, type: 'fixed' }
-            ]}
-        ];
-
-        // Lógica de Pestañas
-        window.switchTab = function(tabId) {
-            const tabs = ['tracker', 'leaks', 'telegram'];
-            tabs.forEach(id => {
-                const el = document.getElementById(id + 'Tab');
-                const btn = document.getElementById('btnTab' + id.charAt(0).toUpperCase() + id.slice(1));
-                if(el) el.classList.toggle('hidden', id !== tabId);
-                if(btn) btn.className = id === tabId ? 
-                    "px-5 py-2 rounded-xl font-bold transition-all duration-300 bg-white/15 text-white shadow-lg border border-white/10 text-xs md:text-sm" : 
-                    "px-5 py-2 rounded-xl font-bold transition-all duration-300 text-gray-400 hover:text-white hover:bg-white/5 text-xs md:text-sm border border-transparent";
-            });
-            if (tabId === 'leaks' && window.loadedRedditPosts.length === 0) loadCustomLeaks();
-            if (tabId === 'telegram' && window.loadedTelegramPosts.length === 0) loadTelegramFeed();
+        const myFirebaseConfig = {
+            apiKey: "AIzaSyDUOtpLstE7-ZU0vZe6i5W-5Sz8XWNIwbQ",
+            authDomain: "genshin-planificator.firebaseapp.com",
+            projectId: "genshin-planificator",
+            storageBucket: "genshin-planificator.firebasestorage.app",
+            messagingSenderId: "506297439229",
+            appId: "1:506297439229:web:6cd50d66dd8d9a68aebf94",
+            measurementId: "G-SCL2Q2Q7E4"
         };
 
-        // LÓGICA DE LA CALCULADORA
-        window.handleVersionChange = () => {
-            const select = document.getElementById('gameVersion');
-            loadVersionData(false, versionProgress[select.value]);
-            saveData();
+        const apiKey = API_KEY_GEMINI; 
+        let isAppReady = false; 
+        let initialSyncDone = false; // PROTECCIÓN DE SOBRESCRITURA
+        let customVersions = {}; 
+        let obtainedCharacters = []; 
+        let currentPity = 0;
+        let prevSpentWishes = 0; 
+        let prevSpentGemsWishes = 0;
+        let customCards = []; 
+        let versionProgress = {};
+        let isFreshDevice = !localStorage.getItem('genshin_tracker_v1_1');
+        
+        let app, auth, db, appId;
+        let currentUser = null;
+        let cloudSyncTimeout = null;
+
+        try {
+            appId = 'genshin-planificator'; 
+            app = initializeApp(myFirebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+        } catch (e) { console.error("Error al iniciar Firebase", e); }
+
+        const database = { 
+            "6.3": { daysTotal: 42, maint: 600, codes: 300, qArchon: 120, qStory: 120, qWorld: 450, chests: 1200, teleports: 120, domains: 120, offeringGems: 480, offeringWishes: 4, abyssGems: 800, theaterGems: 1000, stygia: 450, eventMain: 1000, eA: 420, eB: 420, eC: 420, shopWishes: 5, lBonus: 300 } 
         };
 
-        window.loadVersionData = (isInitial, savedData = null) => {
-            const grid = document.getElementById('categoriesGrid');
-            grid.innerHTML = '';
-            
-            categories.forEach(cat => {
-                const catDiv = document.createElement('div');
-                catDiv.className = "glass-effect rounded-3xl p-5 md:p-6 card-hover animate-fade-in";
-                catDiv.innerHTML = `<h3 class="text-sm font-black text-blue-400 uppercase tracking-tighter mb-4 flex items-center gap-2">
-                    <span class="w-1.5 h-4 bg-blue-500 rounded-full"></span>${cat.name}</h3>`;
-                
-                const itemsDiv = document.createElement('div');
-                itemsDiv.className = "space-y-4";
-                
-                cat.items.forEach(item => {
-                    const savedItem = savedData ? savedData.find(i => i.id === item.id) : null;
-                    const isChecked = savedItem ? savedItem.checked : false;
-                    
-                    const itemEl = document.createElement('div');
-                    itemEl.className = `flex items-center justify-between p-3 rounded-2xl transition-all duration-300 border ${isChecked ? 'bg-blue-500/10 border-blue-500/30' : 'bg-white/5 border-white/5'}`;
-                    itemEl.innerHTML = `
-                        <div class="flex items-center gap-3">
-                            <input type="checkbox" id="${item.id}" ${isChecked ? 'checked' : ''} onchange="updateTotal()" 
-                                class="w-5 h-5 rounded-lg bg-white/10 border-white/20 text-blue-500 focus:ring-0 transition cursor-pointer">
-                            <label for="${item.id}" class="text-sm font-semibold cursor-pointer">${item.name}</label>
-                        </div>
-                        <span class="text-xs font-mono text-gray-400 bg-white/5 px-2 py-1 rounded-lg">${item.value}</span>
-                    `;
-                    itemsDiv.appendChild(itemEl);
-                });
-                
-                catDiv.appendChild(itemsDiv);
-                grid.appendChild(catDiv);
-            });
-            updateTotal();
-        };
+        window.showCustomModal = showCustomModal;
+        window.checkVersionSelect = checkVersionSelect;
+        window.addNewVersionManually = addNewVersionManually;
+        window.renameCurrentVersion = renameCurrentVersion;
+        window.deleteCurrentVersion = deleteCurrentVersion;
+        window.calculate = calculate;
+        window.addManualWishes = addManualWishes;
+        window.addSpentGemsWishes = addSpentGemsWishes;
+        window.addSpentWishes = addSpentWishes;
+        window.recordCharacter = recordCharacter;
+        window.undoCharacterRecord = undoCharacterRecord;
+        window.updateItemCheck = updateItemCheck;
+        window.updateItemVal = updateItemVal;
+        window.toggleItemR2 = toggleItemR2;
+        window.handleImageAnalysis = handleImageAnalysis;
 
-        window.updateTotal = () => {
-            let total = 0;
-            categories.forEach(cat => {
-                cat.items.forEach(item => {
-                    if (document.getElementById(item.id).checked) {
-                        total += item.value;
-                        document.getElementById(item.id).closest('div.flex').classList.add('bg-blue-500/10', 'border-blue-500/30');
-                        document.getElementById(item.id).closest('div.flex').classList.remove('bg-white/5', 'border-white/5');
-                    } else {
-                        document.getElementById(item.id).closest('div.flex').classList.add('bg-white/5', 'border-white/5');
-                        document.getElementById(item.id).closest('div.flex').classList.remove('bg-blue-500/10', 'border-blue-500/30');
-                    }
-                });
-            });
-            document.getElementById('totalDisplay').innerText = total.toLocaleString();
-            saveData();
-        };
-
-        const saveData = async () => {
-            if (!initialSyncDone) return;
-            const select = document.getElementById('gameVersion');
-            const currentData = categories.flatMap(c => c.items.map(i => ({ id: i.id, checked: document.getElementById(i.id).checked })));
-            versionProgress[select.value] = currentData;
-
-            const fullData = {
-                activeVersion: select.value,
-                versionProgress,
-                timestamp: Date.now()
-            };
-            localStorage.setItem('genshin_tracker_v1_1', JSON.stringify(fullData));
-            
-            if (currentUserId) {
-                try {
-                    await setDoc(doc(db, 'artifacts', appId, 'users', currentUserId, 'progress', 'current'), fullData);
-                } catch (e) { console.error("Save Error", e); }
-            }
-        };
-
-        // INICIALIZACIÓN
-        const init = async () => {
-            // Auth
-            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                await signInWithCustomToken(auth, __initial_auth_token);
-            } else {
-                await signInAnonymously(auth);
-            }
-            
-            onAuthStateChanged(auth, async (user) => {
-                if (user) {
-                    currentUserId = user.uid;
-                    document.getElementById('userBadge').classList.remove('hidden');
-                    document.getElementById('userIdDisplay').innerText = `ID: ${user.uid.substring(0,8)}...`;
-                    
-                    // Cargar de Firestore
-                    const docSnap = await getDoc(doc(db, 'artifacts', appId, 'users', user.uid, 'progress', 'current'));
-                    const localData = JSON.parse(localStorage.getItem('genshin_tracker_v1_1'));
-                    
-                    let dataToUse = localData;
-                    if (docSnap.exists()) {
-                        const cloudData = docSnap.data();
-                        if (!localData || cloudData.timestamp > localData.timestamp) {
-                            dataToUse = cloudData;
-                        }
-                    }
-
-                    if (dataToUse) {
-                        versionProgress = dataToUse.versionProgress || {};
-                        const select = document.getElementById('gameVersion');
-                        select.value = dataToUse.activeVersion || "6.3";
-                        loadVersionData(false, versionProgress[select.value]);
-                    } else {
-                        loadVersionData(true);
-                    }
-                    
-                    initialSyncDone = true;
-                    document.getElementById('loadingOverlay').classList.add('opacity-0');
-                    setTimeout(() => document.getElementById('loadingOverlay').classList.add('hidden'), 500);
-                }
-            });
-        };
-
-        init();
-
-        // REDDIT - Doble Proxy para estabilidad
-        window.loadedRedditPosts = [];
-        window.loadCustomLeaks = async function() {
-            const grid = document.getElementById('leaksGrid');
-            grid.innerHTML = Array(6).fill(`<div class="glass-effect rounded-2xl p-5 animate-pulse h-48"></div>`).join('');
-            const redditUrl = 'https://www.reddit.com/r/Genshin_Impact_Leaks/new.json?limit=25';
-            
-            async function tryFetch() {
-                try {
-                    const res = await fetch(`https://corsproxy.io/?${encodeURIComponent(redditUrl)}`);
-                    if (res.ok) return await res.json();
-                    throw new Error();
-                } catch (e) {
-                    const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(redditUrl)}&_=${Date.now()}`);
-                    const data = await res.json();
-                    return JSON.parse(data.contents);
-                }
-            }
-
-            try {
-                const json = await tryFetch();
-                grid.innerHTML = ''; 
-                window.loadedRedditPosts = json.data.children;
-                window.loadedRedditPosts.forEach((post, index) => {
-                    const d = post.data;
-                    if(d.title.includes("Megathread")) return;
-                    const timeAgo = getTimeAgo(new Date(d.created_utc * 1000));
-                    let tagText = d.link_flair_text || "Leak";
-                    let tagClass = "leak-tag " + (tagText.toLowerCase().includes("reliable") ? "tag-reliable" : tagText.toLowerCase().includes("questionable") ? "tag-questionable" : "");
-                    let imageUrl = '';
-                    if (d.preview?.images?.[0]) imageUrl = d.preview.images[0].source.url.replace(/&amp;/g, '&');
-                    else if (d.url && (d.url.endsWith('.jpg') || d.url.endsWith('.png'))) imageUrl = d.url;
-                    
-                    const card = document.createElement('div');
-                    card.className = "glass-effect rounded-2xl p-5 card-hover cursor-pointer flex flex-col h-full";
-                    card.onclick = () => openModal('reddit', index);
-                    card.innerHTML = `
-                        <div class="flex items-start justify-between mb-3 gap-2">
-                            <span class="${tagClass}">${tagText}</span>
-                            <span class="text-[10px] text-gray-500 font-medium">${timeAgo}</span>
-                        </div>
-                        <h3 class="text-sm font-bold text-white mb-3 line-clamp-3 leading-snug flex-1">${d.title}</h3>
-                        ${imageUrl ? `<div class="w-full h-36 rounded-xl overflow-hidden mb-2 border border-white/5 bg-black/20"><img src="${imageUrl}" class="w-full h-full object-cover"></div>` : ''}
-                        <div class="flex items-center gap-2 mt-2 pt-2 border-t border-white/5 text-[10px] text-gray-500">
-                            <span>u/${d.author}</span>
-                            <span class="ml-auto">👍 ${d.score}</span>
-                        </div>`;
-                    grid.appendChild(card);
-                });
-            } catch (e) { grid.innerHTML = `<p class="col-span-full text-center text-red-400 py-10">Error al cargar Reddit.</p>`; }
-        };
-
-        // TELEGRAM - Scraper
-        window.loadedTelegramPosts = [];
-        window.quickSwitchTelegram = function(channel) {
-            document.getElementById('telegramInput').value = channel;
-            document.querySelectorAll('.tele-quick-btn').forEach(btn => btn.classList.toggle('active', btn.getAttribute('data-channel') === channel));
-            loadTelegramFeed();
-        };
-
-        window.loadTelegramFeed = async function() {
-            const channel = document.getElementById('telegramInput').value.trim().replace('@', '') || "team_mew";
-            const grid = document.getElementById('telegramGrid');
-            const countLabel = document.getElementById('telegramCount');
-            countLabel.textContent = "Buscando mensajes...";
-            grid.innerHTML = Array(3).fill(`<div class="glass-effect rounded-2xl p-5 animate-pulse h-60"></div>`).join('');
-            
-            try {
-                const url = `https://t.me/s/${channel}`;
-                const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}&_=${Date.now()}`);
-                const data = await res.json();
-                const docParser = new DOMParser();
-                const doc = docParser.parseFromString(data.contents, 'text/html');
-                const messages = Array.from(doc.querySelectorAll('.tgme_widget_message')).reverse();
-                
-                grid.innerHTML = '';
-                window.loadedTelegramPosts = [];
-                messages.slice(0, 20).forEach((msg, index) => {
-                    const textEl = msg.querySelector('.tgme_widget_message_text');
-                    const cleanHtml = textEl ? textEl.innerHTML : '<i>Contenido multimedia</i>';
-                    const photos = msg.querySelectorAll('.tgme_widget_message_photo_wrap');
-                    const media = [];
-                    photos.forEach(p => {
-                        const m = p.style.backgroundImage.match(/url\(['"]?(.*?)['"]?\)/);
-                        if(m) media.push(m[1]);
-                    });
-
-                    window.loadedTelegramPosts.push({ text: cleanHtml, media, author: channel, date: 'Reciente', link: `https://t.me/s/${channel}` });
-
-                    const card = document.createElement('div');
-                    card.className = "glass-effect rounded-2xl p-5 card-hover cursor-pointer border-t border-[#2AABEE]/20";
-                    card.onclick = () => openModal('telegram', index);
-                    card.innerHTML = `
-                        <div class="text-[10px] text-[#2AABEE] font-bold mb-2 uppercase">@${channel}</div>
-                        <p class="text-xs line-clamp-4 text-gray-300 mb-3">${cleanHtml.replace(/<[^>]*>?/gm, '')}</p>
-                        ${media.length ? `<div class="w-full h-32 rounded-xl overflow-hidden bg-black/20"><img src="${media[0]}" class="w-full h-full object-cover"></div>` : ''}`;
-                    grid.appendChild(card);
-                });
-                countLabel.textContent = `Mostrando mensajes de @${channel}`;
-            } catch (e) { countLabel.textContent = "Error de conexión."; }
-        };
-
-        // MODAL LOGIC
-        window.openModal = function(type, index) {
-            const body = document.getElementById('modalBody');
-            const title = document.getElementById('modalTitle');
-            const meta = document.getElementById('modalMeta');
-            const link = document.getElementById('modalSourceLink');
-            
-            body.innerHTML = '';
-            if (type === 'reddit') {
-                const post = window.loadedRedditPosts[index].data;
-                title.textContent = post.title;
-                meta.textContent = `u/${post.author} • Reddit`;
-                link.href = `https://reddit.com${post.permalink}`;
-                if (post.secure_media?.reddit_video) {
-                    body.innerHTML += `<video controls class="w-full rounded-xl mb-4"><source src="${post.secure_media.reddit_video.fallback_url}" type="video/mp4"></video>`;
-                } else if (post.url && post.url.match(/\.(jpeg|jpg|gif|png|webp)$/i)) {
-                    body.innerHTML += `<img src="${post.url}" class="w-full rounded-xl mb-4">`;
-                }
-                if (post.selftext) body.innerHTML += `<div class="bg-white/5 p-4 rounded-xl text-sm whitespace-pre-wrap">${post.selftext}</div>`;
-            } else {
-                const post = window.loadedTelegramPosts[index];
-                title.textContent = "Post de Telegram";
-                meta.textContent = `@${post.author} • Telegram`;
-                link.href = post.link;
-                post.media.forEach(m => body.innerHTML += `<img src="${m}" class="w-full rounded-xl mb-3">`);
-                body.innerHTML += `<div class="bg-white/5 p-4 rounded-xl text-sm">${post.text}</div>`;
-            }
-
-            const modal = document.getElementById('postModal');
+        function showCustomModal({ title, message, hasInput, showCancel, onConfirm }) {
+            const modal = document.getElementById('customUIModal');
+            const msgEl = document.getElementById('modalMessage');
+            const inputEl = document.getElementById('modalInput');
+            const cancelBtn = document.getElementById('modalBtnCancel');
+            const confirmBtn = document.getElementById('modalBtnConfirm');
+            document.getElementById('modalTitle').innerText = title;
+            if(message) { msgEl.innerText = message; msgEl.classList.remove('hidden'); } else { msgEl.classList.add('hidden'); }
+            if(hasInput) { inputEl.value = ''; inputEl.classList.remove('hidden'); } else { inputEl.classList.add('hidden'); }
+            if(showCancel) cancelBtn.classList.remove('hidden'); else cancelBtn.classList.add('hidden');
             modal.classList.remove('hidden');
-            setTimeout(() => { modal.classList.remove('opacity-0'); document.getElementById('postModalContent').classList.remove('scale-95'); }, 10);
-            document.body.style.overflow = 'hidden';
-        };
-
-        window.closePostModal = function() {
-            const modal = document.getElementById('postModal');
-            modal.classList.add('opacity-0');
-            document.getElementById('postModalContent').classList.add('scale-95');
-            setTimeout(() => { modal.classList.add('hidden'); document.body.style.overflow = ''; }, 300);
-        };
-
-        function getTimeAgo(date) {
-            const seconds = Math.floor((new Date() - date) / 1000);
-            if (seconds < 3600) return Math.floor(seconds/60) + "m";
-            if (seconds < 86400) return Math.floor(seconds/3600) + "h";
-            return Math.floor(seconds/86400) + "d";
+            setTimeout(() => modal.classList.remove('opacity-0'), 10);
+            const newConfirmBtn = confirmBtn.cloneNode(true);
+            confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+            newConfirmBtn.onclick = () => { const val = inputEl.value; modal.classList.add('opacity-0'); setTimeout(() => modal.classList.add('hidden'), 300); if(onConfirm) onConfirm(hasInput ? val : true); };
+            cancelBtn.onclick = () => { modal.classList.add('opacity-0'); setTimeout(() => modal.classList.add('hidden'), 300); };
         }
 
-        // Exponer funciones globales necesarias para el HTML
-        window.updateTotal = updateTotal;
-        window.loadCustomLeaks = loadCustomLeaks;
-        window.loadTelegramFeed = loadTelegramFeed;
-        window.quickSwitchTelegram = quickSwitchTelegram;
+        function getSortedVersions() {
+            const allKeys = ["6.3", ...Object.keys(customVersions)];
+            const uniqueKeys = [...new Set(allKeys)];
+            return uniqueKeys.sort((a, b) => {
+                const numA = parseFloat(a);
+                const numB = parseFloat(b);
+                if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
+                return a.localeCompare(b);
+            });
+        }
+
+        function computeCarryOver(verKey) {
+            const currentVer = document.getElementById('gameVersion').value;
+            if (verKey === currentVer) {
+                const totalWishes = parseInt(document.getElementById('currentBalanceLabel').innerText) || 0;
+                return totalWishes * 160;
+            }
+            const state = versionProgress[verKey];
+            if (!state) return 0;
+            const val = (id) => parseInt(state.inputs[id]) || 0;
+            const isChecked = (id) => !!state.checks[id];
+            let earnedGems = val('daysDone') * 60;
+            if (isChecked('welkin')) earnedGems += (val('daysDone') * 90);
+            if (verKey === "6.3") {
+                if (isChecked('lanternMail')) earnedGems += 1600;
+                if (isChecked('check_lantern_bonus')) earnedGems += val('lanternBonus');
+            }
+            let customEarnedGems = 0; let customEarnedWishes = 0;
+            (state.customCards || []).forEach(card => card.items.forEach(item => { if (item.isChecked) { const v = parseInt(item.value) || 0; if(item.type === 'wishes') customEarnedWishes += v; else customEarnedGems += v; } }));
+            let lanternWishes = (verKey === "6.3" && isChecked('lanternLogin')) ? 10 : 0;
+            let totalGems = val('inventoryGems') + earnedGems + customEarnedGems;
+            let totalWishes = val('manualWishes') + lanternWishes + customEarnedWishes;
+            let spentW = val('spentWishes'); let spentG = val('spentGemsWishes');
+            let finalWishes = Math.max(0, totalWishes - spentW);
+            let finalGems = Math.max(0, totalGems - (spentG * 160));
+            return (Math.floor(finalGems / 160) + finalWishes) * 160;
+        }
+
+        function propagateChain(isUserAction = true) {
+            const sorted = getSortedVersions();
+            let changed = false;
+            for (let i = 0; i < sorted.length - 1; i++) {
+                const currentVer = sorted[i]; const nextVer = sorted[i+1];
+                const carryOver = computeCarryOver(currentVer);
+                let carryPity = 0;
+                if (versionProgress[currentVer]) {
+                    carryPity = versionProgress[currentVer].pity || 0;
+                } else if (document.getElementById('gameVersion').value === currentVer) {
+                    carryPity = currentPity;
+                }
+
+                if (versionProgress[nextVer]) {
+                    const oldGems = parseInt(versionProgress[nextVer].inputs['inventoryGems']) || 0;
+                    if (oldGems !== carryOver) { 
+                        versionProgress[nextVer].inputs['inventoryGems'] = carryOver; 
+                        changed = true; 
+                        if (document.getElementById('gameVersion').value === nextVer) document.getElementById('inventoryGems').value = carryOver; 
+                    }
+
+                    const nextInputs = versionProgress[nextVer].inputs || {};
+                    const nextHistory = versionProgress[nextVer].history || [];
+                    const hasPulls = (parseInt(nextInputs['spentWishes']) || 0) > 0 || (parseInt(nextInputs['spentGemsWishes']) || 0) > 0;
+                    
+                    if (!hasPulls && nextHistory.length === 0) {
+                        if ((versionProgress[nextVer].pity || 0) !== carryPity) {
+                            versionProgress[nextVer].pity = carryPity;
+                            changed = true;
+                            if (document.getElementById('gameVersion').value === nextVer) {
+                                currentPity = carryPity;
+                                document.getElementById('currentPityDisplay').innerText = currentPity;
+                            }
+                        }
+                    }
+                }
+            }
+            if (changed) calculate(isUserAction);
+        }
+
+        function calculate(isUserAction = true) {
+            const getV = (id) => parseInt(document.getElementById(id)?.value) || 0;
+            const isChecked = (id) => document.getElementById(id)?.checked || false;
+            const ver = document.getElementById('gameVersion').value;
+            const daysTotal = getV('daysTotal'); const daysDone = getV('daysDone');
+            document.getElementById('linkedIndicator').classList.toggle('hidden', ver === "6.3");
+            let potentialGems = daysTotal * 60;
+            if (isChecked('welkin')) potentialGems += (daysTotal * 90);
+            if (isChecked('battlepass')) potentialGems += 1320;
+            let potentialWishes = (isChecked('battlepass') ? 5 : 0);
+            let lanternPotentialGems = 0; let lanternPotentialWishes = 0;
+            if (ver === "6.3") { lanternPotentialGems = 1600 + getV('lanternBonus'); lanternPotentialWishes = 10; }
+            let customPotentialGems = 0; let customPotentialWishes = 0;
+            customCards.forEach(card => card.items.forEach(item => { if (item.r2Disabled && item.title.includes("R2")) return; const val = parseInt(item.value) || 0; if(item.type === 'wishes') customPotentialWishes += val; else customPotentialGems += val; }));
+            const inventoryGems = getV('inventoryGems'); const manualWishes = getV('manualWishes'); 
+            const spentWishes = getV('spentWishes'); const spentGemsWishes = getV('spentGemsWishes');
+            const versionOnlyPotentialGems = potentialGems + lanternPotentialGems + customPotentialGems;
+            const versionOnlyPotentialWishes = potentialWishes + lanternPotentialWishes + customPotentialWishes + manualWishes;
+            document.getElementById('versionPotentialWishes').innerText = Math.floor(versionOnlyPotentialGems / 160) + versionOnlyPotentialWishes;
+            const totalPotentialGems = potentialGems + lanternPotentialGems + customPotentialGems;
+            const totalPotentialWishesCount = potentialWishes + lanternPotentialWishes + customPotentialWishes;
+            let earnedGems = daysDone * 60;
+            if (isChecked('welkin')) earnedGems += (daysDone * 90);
+            let earnedLanternWishes = 0;
+            if (ver === "6.3") { if (isChecked('lanternLogin')) earnedLanternWishes += 10; if (isChecked('lanternMail')) earnedGems += 1600; if (isChecked('check_lantern_bonus')) earnedGems += getV('lanternBonus'); }
+            let customEarnedGems = 0; let customEarnedWishes = 0;
+            customCards.forEach(card => card.items.forEach(item => { if (item.isChecked) { const val = parseInt(item.value) || 0; if(item.type === 'wishes') customEarnedWishes += val; else customEarnedGems += val; } }));
+            let currentPoolGems = inventoryGems + earnedGems + customEarnedGems;
+            let currentPoolWishes = manualWishes + earnedLanternWishes + customEarnedWishes;
+            let finalWishesPool = Math.max(0, currentPoolWishes - spentWishes);
+            let finalGemsPool = Math.max(0, currentPoolGems - (spentGemsWishes * 160));
+            document.getElementById('earnedGems').innerText = (currentPoolGems + (currentPoolWishes * 160)).toLocaleString();
+            document.getElementById('earnedWishesNum').innerText = Math.floor(currentPoolGems / 160) + currentPoolWishes;
+            document.getElementById('currentBalanceGems').innerText = finalGemsPool.toLocaleString();
+            document.getElementById('currentBalanceWishes').innerText = finalWishesPool;
+            const currentTotalWishes = Math.floor(finalGemsPool / 160) + finalWishesPool;
+            document.getElementById('currentBalanceLabel').innerText = currentTotalWishes;
+            let totalSpent = spentWishes + spentGemsWishes;
+            let totalPrevSpent = prevSpentWishes + prevSpentGemsWishes;
+            let deltaSpent = totalSpent - totalPrevSpent;
+            if (deltaSpent !== 0) { currentPity += deltaSpent; if (currentPity < 0) currentPity = 0; }
+            document.getElementById('currentPityDisplay').innerText = currentPity;
+            prevSpentWishes = spentWishes; prevSpentGemsWishes = spentGemsWishes;
+            const grandTotalPotentialPullable = Math.floor((totalPotentialGems + inventoryGems) / 160) + totalPotentialWishesCount + manualWishes;
+            document.getElementById('totalPotentialWishes').innerText = grandTotalPotentialPullable;
+            const finalPot = Math.max(0, grandTotalPotentialPullable - totalSpent);
+            document.getElementById('totalFinalWishes').innerText = finalPot;
+            document.getElementById('remainingToGet').innerText = Math.max(0, finalPot - currentTotalWishes);
+            const totalMaxGemsEquiv = totalPotentialGems + (totalPotentialWishesCount * 160);
+            const currentEarnedGemsEquiv = earnedGems + customEarnedGems + (earnedLanternWishes * 160) + (customEarnedWishes * 160) + (ver === "6.3" && isChecked('lanternMail') ? 1600 : 0) + (ver === "6.3" && isChecked('check_lantern_bonus') ? getV('lanternBonus') : 0);
+            const pct = totalMaxGemsEquiv > 0 ? Math.min(100, Math.floor((currentEarnedGemsEquiv / totalMaxGemsEquiv) * 100)) : 0;
+            document.getElementById('percentLabel').innerText = pct;
+            document.getElementById('progressBar').style.width = pct + '%';
+            
+            // PROTECCIÓN: Solo guardamos si la sincronización inicial ha terminado
+            if (isAppReady && initialSyncDone) { saveState(isUserAction); propagateChain(isUserAction); }
+        }
+
+        function saveState(isUserAction = true) { 
+            const ver = document.getElementById('gameVersion').value; 
+            const state = { migrated: true, checks: {}, inputs: {}, history: obtainedCharacters, pity: currentPity, recordDate: document.getElementById('recordDate').value, customCards: customCards }; 
+            
+            document.querySelectorAll('input[type="checkbox"]').forEach(c => { if (c.id && c.id.trim() !== "") state.checks[c.id] = c.checked; }); 
+            document.querySelectorAll('input[type="number"], input[type="text"]').forEach(i => { if (i.id && i.id.trim() !== "") state.inputs[i.id] = i.value; }); 
+            
+            versionProgress[ver] = state; 
+            const previousLocal = JSON.parse(localStorage.getItem('genshin_tracker_v1_1'));
+            let newTimestamp = previousLocal ? previousLocal.timestamp || 0 : 0;
+            if (isUserAction !== false) newTimestamp = Date.now();
+            const payload = { activeVersion: ver, customVersions: customVersions, versionProgress: versionProgress, timestamp: newTimestamp };
+            const cleanPayload = JSON.parse(JSON.stringify(payload));
+            localStorage.setItem('genshin_tracker_v1_1', JSON.stringify(cleanPayload)); 
+            
+            if (auth && currentUser && isAppReady && isUserAction !== false) {
+                const authIcon = document.getElementById('authIcon');
+                if (authIcon) authIcon.innerText = "⏳"; 
+                if (cloudSyncTimeout) clearTimeout(cloudSyncTimeout);
+                cloudSyncTimeout = setTimeout(async () => {
+                    try {
+                        const docRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'tracker_state', 'v1');
+                        await setDoc(docRef, cleanPayload);
+                        if (authIcon) authIcon.innerText = currentUser.isAnonymous ? "☁️" : "👤";
+                    } catch (e) { if (authIcon) authIcon.innerText = "⚠️"; }
+                }, 1500);
+            }
+        }
+
+        async function fetchWithRetry(url, options, retries = 5, backoff = 1000) { try { const response = await fetch(url, options); return await response.json(); } catch (error) { if (retries <= 0) throw error; await new Promise(resolve => setTimeout(resolve, backoff)); return fetchWithRetry(url, options, retries - 1, backoff * 2); } }
+        async function handleImageAnalysis(input) { 
+            if (!input.files || !input.files[0]) return; 
+            const file = input.files[0]; const overlay = document.getElementById('loadingOverlay'); overlay.classList.remove('hidden'); 
+            document.getElementById('loadingMsg').innerText = "Gemini está analizando la versión...";
+            try { 
+                const imageData = await new Promise((resolve) => { const reader = new FileReader(); reader.onload = () => resolve(reader.result.split(',')[1]); reader.readAsDataURL(file); }); 
+                const result = await fetchWithRetry(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: "Analiza el JSON de protogemas..." }, { inlineData: { mimeType: file.type, data: imageData } }] }], generationConfig: { responseMimeType: "application/json" } }) }); 
+                if (result.error) throw new Error(result.error.message); const text = result.candidates?.[0]?.content?.parts?.[0]?.text; 
+                if (text) { const newData = JSON.parse(text); newData.isIA = true; const verKey = newData.ver || `Analizada_${Date.now()}`; customVersions[verKey] = newData; updateSelectOptions(); const select = document.getElementById('gameVersion'); select.value = verKey; loadVersionData(true, null); } 
+            } catch (error) { showCustomModal({title: "Error", message: error.message}); } finally { overlay.classList.add('hidden'); input.value = ""; } 
+        }
+        
+        function updateSelectOptions() { const select = document.getElementById('gameVersion'); const currentVal = select.value; while (select.options.length > 2) { select.remove(1); } for (let verKey in customVersions) { const opt = document.createElement('option'); opt.value = verKey; opt.innerText = `v${verKey}`; select.insertBefore(opt, select.options[select.options.length - 1]); } select.value = currentVal; }
+        function checkVersionSelect() { const select = document.getElementById('gameVersion'); if (select.value === 'upload') { document.getElementById('imageInput').click(); select.value = window._prevVer || "6.3"; return; } window._prevVer = select.value; loadVersionData(false, versionProgress[select.value] || null); }
+        function addNewVersionManually() { showCustomModal({ title: "Nueva Versión Manual", message: "Introduce el nombre de la nueva versión:", hasInput: true, showCancel: true, onConfirm: (newName) => { if (!newName || newName.trim() === "") return; const verKey = newName.trim(); if (customVersions[verKey] || verKey === "6.3") { showCustomModal({ title: "Error", message: "Esa versión ya existe." }); return; } customVersions[verKey] = { ...database["6.3"], isManual: true }; updateSelectOptions(); document.getElementById('gameVersion').value = verKey; loadVersionData(true, null); saveState(true); } }); }
+        
+        function deleteCurrentVersion() {
+            const select = document.getElementById('gameVersion');
+            const currentVer = select.value;
+            if (currentVer === "6.3") {
+                showCustomModal({ title: "No permitido", message: "No puedes eliminar la versión base del juego (6.3)." });
+                return;
+            }
+            showCustomModal({
+                title: "¿Eliminar Versión?",
+                message: `Vas a borrar permanentemente la versión ${currentVer} y todo su progreso guardado localmente y en la nube.`,
+                showCancel: true,
+                onConfirm: (confirmed) => {
+                    if (!confirmed) return;
+                    delete customVersions[currentVer];
+                    delete versionProgress[currentVer];
+                    updateSelectOptions();
+                    select.value = "6.3";
+                    loadVersionData(false, versionProgress["6.3"] || null);
+                    saveState(true);
+                }
+            });
+        }
+
+        function loadVersionData(reset, saved) {
+            const ver = document.getElementById('gameVersion').value; 
+            if (ver === "6.3") document.getElementById('lanternRiteCard').classList.remove('hidden'); 
+            else document.getElementById('lanternRiteCard').classList.add('hidden');
+            
+            document.querySelectorAll('input[type="number"], input[type="text"]').forEach(i => i.value = 0); 
+            document.querySelectorAll('input[type="checkbox"]').forEach(c => c.checked = false);
+            
+            if (reset) { 
+                obtainedCharacters = []; 
+                currentPity = 0; 
+                
+                const sorted = getSortedVersions();
+                const idx = sorted.indexOf(ver);
+                if (idx > 0) {
+                    const prevVer = sorted[idx - 1];
+                    if (versionProgress[prevVer]) currentPity = versionProgress[prevVer].pity || 0;
+                }
+                
+                prevSpentWishes = 0; 
+                prevSpentGemsWishes = 0; 
+                customCards = getDefaultDynamicCards(ver); 
+                document.getElementById('daysTotal').value = 42; 
+                document.getElementById('lanternBonus').value = 300; 
+            } else if (saved) {
+                obtainedCharacters = saved.history || []; 
+                currentPity = saved.pity || 0; 
+                customCards = saved.customCards || getDefaultDynamicCards(ver, saved.inputs, saved.checks);
+                for(let id in saved.inputs) { const el = document.getElementById(id); if(el) el.value = saved.inputs[id]; }
+                for(let id in saved.checks) { const el = document.getElementById(id); if(el) el.checked = saved.checks[id]; }
+                document.getElementById('recordDate').value = saved.recordDate || ""; 
+                prevSpentWishes = parseInt(saved.inputs['spentWishes']) || 0; 
+                prevSpentGemsWishes = parseInt(saved.inputs['spentGemsWishes']) || 0;
+            }
+            renderHistory(); renderCustomCards(); calculate(false);
+        }
+
+        function renderHistory() { const container = document.getElementById('characterHistory'); container.innerHTML = obtainedCharacters.map(c => `<div class="p-1 bg-slate-900/60 rounded border-l-2 border-purple-500 flex justify-between items-center text-[9px]"><span class="font-bold text-white truncate max-w-[60%]">${c.name}</span><span class="font-black text-purple-400">Pity ${c.pity}</span></div>`).join(''); }
+        
+        function renderCustomCards() { 
+            const container = document.getElementById('customCardsContainer'); 
+            container.innerHTML = customCards.map(card => {
+                const isEndGame = card.title.includes("END GAME");
+                const gridClass = isEndGame ? "md:col-span-2 lg:col-span-2 max-w-[520px]" : "";
+                
+                return `
+                <section class="card flex flex-col h-max ${gridClass}"> 
+                    <h2 class="section-title text-indigo-300">${card.title}</h2> 
+                    <div class="grid grid-cols-2 gap-2.5"> 
+                        ${card.items.map(item => { 
+                            const isR2 = item.title.includes("R2"); 
+                            const isHidden = item.r2Disabled && isR2; 
+                            const spanClass = item.span === 1 ? 'col-span-1' : 'col-span-2';
+                            
+                            return ` 
+                            <div class="${spanClass} flex items-center ${item.span === 1 ? 'gap-1.5 p-1.5' : 'gap-3 p-2'} bg-slate-900/40 rounded border border-slate-700/50 transition-all"> 
+                                <input type="checkbox" class="progress-check ${isHidden ? 'opacity-20 grayscale' : ''}" ${item.isChecked ? 'checked' : ''} onchange="updateItemCheck('${card.id}', '${item.id}', this.checked)"> 
+                                <div class="flex-1 min-w-0 ${isHidden ? 'opacity-20 grayscale' : ''}"> 
+                                    <label class="text-[${item.span === 1 ? '9px' : '11px'}] text-slate-400 font-bold block truncate">${item.title}</label> 
+                                    <div class="flex items-center gap-1"> 
+                                        <input type="number" value="${item.value}" oninput="updateItemVal('${card.id}', '${item.id}', this.value)" class="text-[10px] py-1 bg-slate-800 text-center" style="color: ${item.type === 'wishes' ? '#f472b6' : '#4ade80'}"> 
+                                    </div> 
+                                </div> 
+                                ${isR2 ? `<button onclick="toggleItemR2('${card.id}', '${item.id}')" class="btn-inline-r2 ${!item.r2Disabled ? 'active' : ''}" title="Habilitar R2">🔄</button>` : ''} 
+                            </div>`; 
+                        }).join('')} 
+                    </div> 
+                </section>`;
+            }).join(''); 
+        }
+
+        function updateItemCheck(cardId, itemId, val) { const c = customCards.find(x => x.id === cardId); const i = c.items.find(x => x.id === itemId); i.isChecked = val; calculate(true); }
+        function updateItemVal(cardId, itemId, val) { const c = customCards.find(x => x.id === cardId); const i = c.items.find(x => x.id === itemId); i.value = val; calculate(true); }
+        function recordCharacter() { const name = document.getElementById('characterName').value || "5★"; obtainedCharacters.unshift({name, pity: currentPity}); currentPity = 0; document.getElementById('characterName').value = ""; renderHistory(); calculate(true); }
+        function undoCharacterRecord() { if (obtainedCharacters.length === 0) return; const lastRecord = obtainedCharacters.shift(); currentPity = lastRecord.pity; renderHistory(); calculate(true); }
+        function addSpentWishes(n) { document.getElementById('spentWishes').value = Math.max(0, (parseInt(document.getElementById('spentWishes').value) || 0) + n); calculate(true); }
+        function addSpentGemsWishes(n) { document.getElementById('spentGemsWishes').value = Math.max(0, (parseInt(document.getElementById('spentGemsWishes').value) || 0) + n); calculate(true); }
+        function addManualWishes(n) { document.getElementById('manualWishes').value = Math.max(0, (parseInt(document.getElementById('manualWishes').value) || 0) + n); calculate(true); }
+        function toggleItemR2(cardId, itemId) { const card = customCards.find(c => c.id === cardId); if (card) { const item = card.items.find(i => i.id === itemId); if (item) { item.r2Disabled = !item.r2Disabled; renderCustomCards(); calculate(true); } } }
+        function renameCurrentVersion() { const select = document.getElementById('gameVersion'); const oldKey = select.value; if (oldKey === "6.3") return; showCustomModal({ title: "Renombrar", hasInput: true, showCancel: true, onConfirm: (newName) => { if (!newName) return; const newKey = newName.trim(); customVersions[newKey] = customVersions[oldKey]; delete customVersions[oldKey]; if (versionProgress[oldKey]) { versionProgress[newKey] = versionProgress[oldKey]; delete versionProgress[oldKey]; } updateSelectOptions(); select.value = newKey; saveState(true); } }); }
+        
+        function getDefaultDynamicCards(ver, savedInputs = {}, savedChecks = {}) { 
+            const dbData = customVersions[ver] || database[ver] || database["6.3"]; 
+            const val = (dbKey, htmlId, def) => (savedInputs[htmlId] !== undefined) ? parseInt(savedInputs[htmlId]) : (dbData[dbKey] !== undefined ? parseInt(dbData[dbKey]) : def); 
+            const getC = (htmlId) => savedChecks[htmlId] === true; 
+            const id = () => Math.random().toString(36).substr(2, 9); 
+            
+            return [ 
+                { id: id(), title: "📖 Misiones", items: [ { id: id(), title: "Arconte", value: val('qArchon', 'questArchon', 120), type: "gems", span: 2, isChecked: getC('check_archon') }, { id: id(), title: "Historia", value: val('qStory', 'questStory', 120), type: "gems", span: 2, isChecked: getC('check_story') }, { id: id(), title: "Mundo", value: val('qWorld', 'questWorld', 450), type: "gems", span: 2, isChecked: getC('check_world') } ]}, 
+                { id: id(), title: "🗺️ Exploración", items: [ { id: id(), title: "Cofres", value: val('chests', 'mapChests', 1200), type: "gems", span: 2, isChecked: getC('check_chests') }, { id: id(), title: "Teleports", value: val('teleports', 'mapTeleports', 120), type: "gems", span: 1, isChecked: getC('check_teleports') }, { id: id(), title: "Dominios", value: val('domains', 'mapDomains', 120), type: "gems", span: 1, isChecked: getC('check_domains') }, { id: id(), title: "Ofrendas (Gemas)", value: val('offeringGems', 'offeringGems', 480), type: "gems", span: 2, isChecked: getC('check_offeringG') }, { id: id(), title: "Ofrendas (Deseos)", value: val('offeringWishes', 'offeringWishes', 4), type: "wishes", span: 2, isChecked: getC('check_offeringW') } ]}, 
+                { id: id(), title: "🎁 Eventos y Tienda", items: [ { id: id(), title: "Mantenimiento", value: val('maint', 'maintGems', 600), type: "gems", span: 2, isChecked: getC('check_maint') }, { id: id(), title: "Principal", value: val('eventMain', 'eventMain', 1000), type: "gems", span: 2, isChecked: getC('check_event_main') }, { id: id(), title: "Evento A", value: val('eA', 'eventSubA', 420), type: "gems", span: 1, isChecked: getC('check_e1') }, { id: id(), title: "Evento B", value: val('eB', 'eventSubB', 420), type: "gems", span: 1, isChecked: getC('check_e2') }, { id: id(), title: "Evento C", value: val('eC', 'eventSubC', 420), type: "gems", span: 2, isChecked: getC('check_e3') }, { id: id(), title: "Tienda R1", value: val('shopWishes', 'shopWishes1', 5), type: "wishes", span: 1, isChecked: getC('check_shop1') }, { id: id(), title: "Tienda R2", value: val('shopWishes', 'shopWishes2', 5), type: "wishes", span: 1, isChecked: getC('check_shop2'), r2Disabled: false }, { id: id(), title: "Stream Códigos", value: val('codes', 'streamCodes', 300), type: "gems", span: 2, isChecked: getC('check_stream') } ]}, 
+                { id: id(), title: "🏆 END GAME", items: [ { id: id(), title: "Abismo R1", value: val('abyssGems', 'abyssGems1', 800), type: "gems", span: 1, isChecked: getC('check_abyss1') }, { id: id(), title: "Abismo R2", value: val('abyssGems', 'abyssGems2', 800), type: "gems", span: 1, isChecked: getC('check_abyss2'), r2Disabled: false }, { id: id(), title: "Teatro R1", value: val('theaterGems', 'theaterGems1', 1000), type: "gems", span: 1, isChecked: getC('check_theater1') }, { id: id(), title: "Teatro R2", value: val('theaterGems', 'theaterGems2', 1000), type: "gems", span: 1, isChecked: getC('check_theater2'), r2Disabled: false }, { id: id(), title: "Estigia", value: val('stygia', 'stygiaGems', 450), type: "gems", span: 2, isChecked: getC('check_stygia') } ]} 
+            ]; 
+        }
+
+        window.onload = () => {
+            const s = JSON.parse(localStorage.getItem('genshin_tracker_v1_1'));
+            if(s) { 
+                customVersions = s.customVersions || {}; 
+                versionProgress = s.versionProgress || {}; 
+                updateSelectOptions(); 
+                const select = document.getElementById('gameVersion'); 
+                const currentVer = s.activeVersion || "6.3"; 
+                select.value = currentVer; 
+                loadVersionData(false, versionProgress[currentVer]); 
+            } else loadVersionData(true);
+            isAppReady = true;
+        };
+
+        const provider = new GoogleAuthProvider();
+        window.toggleAuth = async function() {
+            if (!auth) return;
+            try {
+                if (currentUser && !currentUser.isAnonymous) {
+                    showCustomModal({ title: "¿Cerrar Sesión?", message: "Vas a desconectar tu cuenta de Google.", showCancel: true, onConfirm: async () => { await signOut(auth); await signInAnonymously(auth); window.location.reload(); } });
+                } else { await signInWithPopup(auth, provider); }
+            } catch (error) { showCustomModal({ title: "Error", message: error.message }); }
+        };
+
+        onAuthStateChanged(auth, async (user) => {
+            const iconEl = document.getElementById('authIcon');
+            const labelEl = document.getElementById('authLabel');
+            
+            if (user) {
+                currentUser = user;
+                
+                // ACTUALIZACIÓN DE ICONO Y LABEL
+                if (!user.isAnonymous) {
+                    iconEl.innerText = "👤";
+                    labelEl.innerText = user.displayName ? user.displayName.split(' ')[0] : "Perfil";
+                } else {
+                    iconEl.innerText = "☁️";
+                    labelEl.innerText = "Local";
+                }
+
+                const processCloudSync = async () => {
+                    const docRef = doc(db, 'artifacts', appId, 'users', user.uid, 'tracker_state', 'v1');
+                    try {
+                        const snap = await getDoc(docRef);
+                        if (snap.exists()) {
+                            const cloudData = snap.data(); const localData = JSON.parse(localStorage.getItem('genshin_tracker_v1_1'));
+                            const cloudTs = cloudData.timestamp || 0; const localTs = localData ? (localData.timestamp || 0) : 0;
+                            
+                            // Solo descargamos si la nube es más reciente o el dispositivo está vacío
+                            if (cloudTs > localTs || isFreshDevice) {
+                                document.getElementById('loadingOverlay').classList.remove('hidden');
+                                customVersions = cloudData.customVersions || {}; versionProgress = cloudData.versionProgress || {}; 
+                                updateSelectOptions(); const select = document.getElementById('gameVersion'); select.value = cloudData.activeVersion || "6.3";
+                                loadVersionData(false, versionProgress[select.value]); localStorage.setItem('genshin_tracker_v1_1', JSON.stringify(cloudData)); 
+                                isFreshDevice = false; 
+                                document.getElementById('loadingOverlay').classList.add('hidden');
+                            }
+                        }
+                    } catch (e) { console.error("Cloud Error", e); }
+                    initialSyncDone = true; // PERMITIMOS EL GUARDADO DESPUÉS DE LA CARGA
+                };
+                if (isAppReady) processCloudSync(); else setTimeout(processCloudSync, 500);
+            }
+        });
     </script>
 </body>
 </html>
