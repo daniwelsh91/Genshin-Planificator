@@ -80,14 +80,6 @@
         .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 8px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 8px; }
 
-        .truncate-2-lines {
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        /* Botones de canal activo */
         .tele-quick-btn.active {
             background-color: rgba(42, 171, 238, 0.25);
             border-color: rgba(42, 171, 238, 0.6);
@@ -98,7 +90,6 @@
 </head>
 <body class="min-h-screen flex flex-col relative text-gray-100 overflow-x-hidden">
 
-    <!-- Decorative background elements -->
     <div class="fixed top-[-10%] left-[-10%] w-[40vw] h-[40vw] rounded-full bg-blue-600/10 blur-[120px] z-[-1] pointer-events-none"></div>
     <div class="fixed bottom-[-10%] right-[-10%] w-[40vw] h-[40vw] rounded-full bg-purple-600/10 blur-[120px] z-[-1] pointer-events-none"></div>
 
@@ -124,7 +115,6 @@
 
     <main class="flex-grow container mx-auto px-4 py-4 relative z-10 flex flex-col items-center pb-24">
         
-        <!-- Tab: Calculator -->
         <div id="trackerTab" class="hidden w-full flex flex-col items-center animate-fade-in">
             <div class="glass-effect rounded-3xl p-8 mb-6 text-center border-l-4 border-blue-500 max-w-2xl">
                 <h2 class="text-xl font-bold text-white mb-2">Calculadora Principal</h2>
@@ -132,7 +122,6 @@
             </div>
         </div>
 
-        <!-- Tab: Reddit Leaks -->
         <div id="leaksTab" class="hidden w-full max-w-6xl flex flex-col items-center animate-fade-in">
             <div class="w-full flex flex-col sm:flex-row justify-between items-start sm:items-end mb-8 gap-4 px-2">
                 <div>
@@ -150,7 +139,6 @@
             <div id="leaksGrid" class="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </div>
 
-        <!-- Tab: Telegram Feed -->
         <div id="telegramTab" class="hidden w-full max-w-6xl flex flex-col items-center animate-fade-in">
             <div class="w-full flex flex-col sm:flex-row justify-between items-start sm:items-end mb-8 gap-4 px-2">
                 <div>
@@ -164,25 +152,17 @@
                 </div>
                 
                 <div class="flex flex-col gap-3 w-full sm:w-auto">
-                    <!-- Quick Toggle Buttons -->
                     <div class="flex gap-2">
-                        <button onclick="quickSwitchTelegram('team_mew')" class="tele-quick-btn active glass-effect flex-1 sm:flex-none px-4 py-1.5 rounded-lg text-xs font-bold transition-all border border-white/10 text-gray-400 hover:text-white" data-channel="team_mew">
-                            @team_mew
-                        </button>
-                        <button onclick="quickSwitchTelegram('hiragara_leaks')" class="tele-quick-btn glass-effect flex-1 sm:flex-none px-4 py-1.5 rounded-lg text-xs font-bold transition-all border border-white/10 text-gray-400 hover:text-white" data-channel="hiragara_leaks">
-                            @hiragara_leaks
-                        </button>
+                        <button onclick="quickSwitchTelegram('team_mew')" class="tele-quick-btn active glass-effect flex-1 sm:flex-none px-4 py-1.5 rounded-lg text-xs font-bold transition-all border border-white/10 text-gray-400 hover:text-white" data-channel="team_mew">@team_mew</button>
+                        <button onclick="quickSwitchTelegram('hiragara_leaks')" class="tele-quick-btn glass-effect flex-1 sm:flex-none px-4 py-1.5 rounded-lg text-xs font-bold transition-all border border-white/10 text-gray-400 hover:text-white" data-channel="hiragara_leaks">@hiragara_leaks</button>
                     </div>
 
                     <div class="flex gap-2">
                         <div class="relative flex-1 sm:w-48">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><span class="text-gray-500 font-bold text-sm">@</span></div>
-                            <input type="text" id="telegramInput" value="team_mew" placeholder="Canal..." 
-                                   class="w-full bg-white/5 border border-white/10 rounded-xl py-2 pl-8 pr-3 text-white text-sm focus:outline-none focus:border-[#2AABEE]/50 transition">
+                            <input type="text" id="telegramInput" value="team_mew" placeholder="Canal..." class="w-full bg-white/5 border border-white/10 rounded-xl py-2 pl-8 pr-3 text-white text-sm focus:outline-none focus:border-[#2AABEE]/50 transition">
                         </div>
-                        <button onclick="loadTelegramFeed()" class="bg-[#2AABEE]/20 hover:bg-[#2AABEE]/40 text-[#2AABEE] border border-[#2AABEE]/50 px-4 py-2 rounded-xl text-sm font-bold transition flex items-center gap-2">
-                            Buscar
-                        </button>
+                        <button onclick="loadTelegramFeed()" class="bg-[#2AABEE]/20 hover:bg-[#2AABEE]/40 text-[#2AABEE] border border-[#2AABEE]/50 px-4 py-2 rounded-xl text-sm font-bold transition flex items-center gap-2">Buscar</button>
                     </div>
                 </div>
             </div>
@@ -191,7 +171,6 @@
 
     </main>
 
-    <!-- Unified Modal for Reddit and Telegram -->
     <div id="postModal" class="fixed inset-0 z-[100] hidden opacity-0 transition-opacity duration-300 flex items-center justify-center p-4">
         <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closePostModal()"></div>
         <div id="postModalContent" class="relative w-full max-w-3xl max-h-[90vh] glass-effect border border-white/20 rounded-3xl shadow-2xl flex flex-col overflow-hidden transition-transform duration-300 scale-95">
@@ -218,7 +197,6 @@
         window.loadedRedditPosts = [];
         window.loadedTelegramPosts = [];
 
-        // Tab System
         function switchTab(tabId) {
             const tabs = ['tracker', 'leaks', 'telegram'];
             const activeClass = "px-6 py-2.5 rounded-xl font-bold transition-all duration-300 bg-white/15 text-white shadow-lg border border-white/10 text-sm md:text-base";
@@ -235,13 +213,18 @@
             });
         }
 
-        // Reddit Loader
+        // CARGA DE REDDIT (AHORA CON PROXY PARA EVITAR CORS)
         async function loadCustomLeaks() {
             const grid = document.getElementById('leaksGrid');
             grid.innerHTML = Array(6).fill(`<div class="glass-effect rounded-2xl p-5 animate-pulse"><div class="h-4 w-24 bg-white/10 rounded mb-4"></div><div class="h-10 w-full bg-white/10 rounded mb-4"></div><div class="h-40 w-full bg-white/10 rounded"></div></div>`).join('');
+            
             try {
-                const response = await fetch('https://www.reddit.com/r/Genshin_Impact_Leaks/new.json?limit=15');
-                const json = await response.json();
+                // Usamos proxy para Reddit porque el fetch directo suele ser bloqueado por CORS en muchos navegadores
+                const redditUrl = 'https://www.reddit.com/r/Genshin_Impact_Leaks/new.json?limit=15';
+                const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(redditUrl)}`);
+                const data = await response.json();
+                const json = JSON.parse(data.contents);
+
                 grid.innerHTML = ''; 
                 window.loadedRedditPosts = [];
                 json.data.children.forEach(post => {
@@ -275,32 +258,25 @@
                     `;
                     grid.appendChild(card);
                 });
-            } catch (e) { console.error(e); }
+            } catch (e) { 
+                console.error(e);
+                grid.innerHTML = `<div class="col-span-full text-center py-10 text-red-400">Error cargando Reddit. Intenta refrescar.</div>`;
+            }
         }
 
-        // Telegram quick toggle
         function quickSwitchTelegram(channel) {
             document.getElementById('telegramInput').value = channel;
-            
-            // UI Feedback: Update active button
             document.querySelectorAll('.tele-quick-btn').forEach(btn => {
-                if (btn.getAttribute('data-channel') === channel) {
-                    btn.classList.add('active');
-                } else {
-                    btn.classList.remove('active');
-                }
+                btn.classList.toggle('active', btn.getAttribute('data-channel') === channel);
             });
-
             loadTelegramFeed();
         }
 
-        // Telegram Scraper Loader
         async function loadTelegramFeed() {
             const inputField = document.getElementById('telegramInput');
             const countLabel = document.getElementById('telegramCount');
             let channelName = inputField.value.trim().replace('@', '') || "team_mew";
             
-            // Update active state of quick buttons based on input
             document.querySelectorAll('.tele-quick-btn').forEach(btn => {
                 btn.classList.toggle('active', btn.getAttribute('data-channel') === channelName);
             });
@@ -315,6 +291,9 @@
                 const url = `https://t.me/s/${channelName}`;
                 const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}&_=${Date.now()}`);
                 const data = await response.json();
+                
+                if(!data.contents) throw new Error("Sin contenido");
+
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(data.contents, 'text/html');
                 const messages = Array.from(doc.querySelectorAll('.tgme_widget_message')).reverse();
@@ -323,8 +302,8 @@
                 window.loadedTelegramPosts = [];
 
                 if (messages.length === 0) {
-                    countLabel.textContent = "No se encontraron mensajes públicos.";
-                    grid.innerHTML = `<div class="col-span-full text-center py-10 text-red-400">Canal privado o no encontrado.</div>`;
+                    countLabel.textContent = "No hay mensajes públicos disponibles.";
+                    grid.innerHTML = `<div class="col-span-full text-center py-10 text-red-400 font-bold">❌ El canal es privado o no existe.</div>`;
                     return;
                 }
 
@@ -379,15 +358,13 @@
                     `;
                     grid.appendChild(card);
                 });
-                
-                countLabel.textContent = `Se encontraron ${window.loadedTelegramPosts.length} mensajes recientes.`;
+                countLabel.textContent = `Se encontraron ${window.loadedTelegramPosts.length} mensajes.`;
             } catch (e) { 
                 console.error(e); 
                 countLabel.textContent = "Error al conectar con Telegram.";
             }
         }
 
-        // Unified Modal Logic
         function openModal(type, index) {
             const modal = document.getElementById('postModal');
             const content = document.getElementById('postModalContent');
@@ -417,7 +394,6 @@
                 } else if (post.url && post.url.match(/\.(jpeg|jpg|gif|png)$/i)) {
                     contentHtml += `<img src="${post.url}" class="w-full rounded-xl bg-black/20 border border-white/5 shadow-md">`;
                 }
-                
                 if (post.selftext_html) {
                     const txt = document.createElement('div');
                     txt.innerHTML = post.selftext_html.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&amp;/g, '&');
@@ -434,11 +410,7 @@
                 if (post.media && post.media.length > 0) {
                     contentHtml += `<div class="flex flex-col gap-4">`;
                     post.media.forEach(m => {
-                        contentHtml += `
-                            <div class="relative group">
-                                <img src="${m.url}" class="w-full rounded-xl bg-black/40 border border-white/5 shadow-xl">
-                                ${m.type === 'video' ? `<div class="absolute inset-0 flex items-center justify-center bg-black/20"><div class="p-4 bg-[#2AABEE]/80 rounded-full shadow-lg"><svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div>` : ''}
-                            </div>`;
+                        contentHtml += `<div class="relative group"><img src="${m.url}" class="w-full rounded-xl bg-black/40 border border-white/5 shadow-xl">${m.type === 'video' ? `<div class="absolute inset-0 flex items-center justify-center bg-black/20"><div class="p-4 bg-[#2AABEE]/80 rounded-full shadow-lg"><svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div>` : ''}</div>`;
                     });
                     contentHtml += `</div>`;
                 }
@@ -458,7 +430,6 @@
             setTimeout(() => { modal.classList.add('hidden'); document.getElementById('modalBody').innerHTML = ''; document.body.style.overflow = ''; }, 300);
         }
 
-        // Time Utility
         function getTimeAgo(date) {
             if (isNaN(date.getTime())) return "Reciente";
             const seconds = Math.floor((new Date() - date) / 1000);
