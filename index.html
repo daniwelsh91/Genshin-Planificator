@@ -150,6 +150,17 @@
             padding: 0.25rem 0;
             border-radius: 4px;
         }
+        
+        .btn-add-green {
+            flex: 1;
+            background-color: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #4ade80;
+            font-size: 0.75rem;
+            font-weight: 900;
+            padding: 0.25rem 0;
+            border-radius: 4px;
+        }
 
         .btn-inline-r2 {
             background-color: rgba(239, 68, 68, 0.15);
@@ -304,18 +315,34 @@
                     </div>
                 </div>
 
-                <div class="card border-green-500/30 text-center lg:col-span-1">
+                <div class="card border-green-500/30 text-center lg:col-span-1 flex flex-col justify-center">
                     <label class="block text-[10px] text-green-400 font-bold uppercase mb-2">Protogemas Iniciales</label>
                     <input type="number" id="inventoryGems" value="0" class="text-xl font-black text-center text-green-400" oninput="calculate()">
                     <span id="linkedIndicator" class="linked-indicator hidden">🔗 Sincronizado</span>
                 </div>
-                <div class="card border-pink-500/30 text-center lg:col-span-1">
-                    <label class="block text-[10px] text-pink-300 font-bold uppercase mb-2">Deseos Ganados</label>
-                    <input type="number" id="manualWishes" value="0" class="text-xl font-black text-center text-pink-400 mb-2" oninput="calculate()">
-                    <div class="flex gap-1">
-                        <button onclick="addManualWishes(-1)" class="btn-sub-red">-1</button>
-                        <button onclick="addManualWishes(1)" class="btn-add-pink">+1</button>
-                        <button onclick="addManualWishes(10)" class="btn-add-pink">+10</button>
+                
+                <!-- Ajustes Manuales Card -->
+                <div class="card border-pink-500/30 text-center lg:col-span-1 flex flex-col justify-center p-3">
+                    <div class="flex flex-col gap-3">
+                        <div class="space-y-1">
+                            <label class="block text-[9px] text-pink-300 font-black uppercase">Deseos Ganados</label>
+                            <input type="number" id="manualWishes" value="0" class="text-lg font-black text-center text-pink-400 mb-1 bg-slate-900 border-pink-500/20" oninput="calculate()">
+                            <div class="flex gap-1">
+                                <button onclick="addManualWishes(-1)" class="btn-sub-red">-1</button>
+                                <button onclick="addManualWishes(1)" class="btn-add-pink">+1</button>
+                                <button onclick="addManualWishes(10)" class="btn-add-pink">+10</button>
+                            </div>
+                        </div>
+                        <div class="h-px bg-slate-700/50 w-full"></div>
+                        <div class="space-y-1">
+                            <label class="block text-[9px] text-green-300 font-black uppercase">Protogemas Ganadas</label>
+                            <input type="number" id="manualGems" value="0" class="text-lg font-black text-center text-green-400 mb-1 bg-slate-900 border-green-500/20" oninput="calculate()">
+                            <div class="flex gap-1">
+                                <button onclick="addManualGems(-10)" class="btn-sub-red">-10</button>
+                                <button onclick="addManualGems(10)" class="btn-add-green">+10</button>
+                                <button onclick="addManualGems(100)" class="btn-add-green">+100</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
@@ -481,7 +508,7 @@
 
         const apiKey = API_KEY_GEMINI; 
         let isAppReady = false; 
-        let initialSyncDone = false; // PROTECCIÓN DE SOBRESCRITURA
+        let initialSyncDone = false; 
         let customVersions = {}; 
         let obtainedCharacters = []; 
         let currentPity = 0;
@@ -513,6 +540,7 @@
         window.deleteCurrentVersion = deleteCurrentVersion;
         window.calculate = calculate;
         window.addManualWishes = addManualWishes;
+        window.addManualGems = addManualGems;
         window.addSpentGemsWishes = addSpentGemsWishes;
         window.addSpentWishes = addSpentWishes;
         window.recordCharacter = recordCharacter;
@@ -570,7 +598,7 @@
             let customEarnedGems = 0; let customEarnedWishes = 0;
             (state.customCards || []).forEach(card => card.items.forEach(item => { if (item.isChecked) { const v = parseInt(item.value) || 0; if(item.type === 'wishes') customEarnedWishes += v; else customEarnedGems += v; } }));
             let lanternWishes = (verKey === "6.3" && isChecked('lanternLogin')) ? 10 : 0;
-            let totalGems = val('inventoryGems') + earnedGems + customEarnedGems;
+            let totalGems = val('inventoryGems') + earnedGems + customEarnedGems + val('manualGems');
             let totalWishes = val('manualWishes') + lanternWishes + customEarnedWishes;
             let spentW = val('spentWishes'); let spentG = val('spentGemsWishes');
             let finalWishes = Math.max(0, totalWishes - spentW);
@@ -632,47 +660,57 @@
             if (ver === "6.3") { lanternPotentialGems = 1600 + getV('lanternBonus'); lanternPotentialWishes = 10; }
             let customPotentialGems = 0; let customPotentialWishes = 0;
             customCards.forEach(card => card.items.forEach(item => { if (item.r2Disabled && item.title.includes("R2")) return; const val = parseInt(item.value) || 0; if(item.type === 'wishes') customPotentialWishes += val; else customPotentialGems += val; }));
-            const inventoryGems = getV('inventoryGems'); const manualWishes = getV('manualWishes'); 
-            const spentWishes = getV('spentWishes'); const spentGemsWishes = getV('spentGemsWishes');
-            const versionOnlyPotentialGems = potentialGems + lanternPotentialGems + customPotentialGems;
+            const inventoryGems = getV('inventoryGems'); 
+            const manualWishes = getV('manualWishes'); 
+            const manualGems = getV('manualGems');
+            const spentWishes = getV('spentWishes'); 
+            const spentGemsWishes = getV('spentGemsWishes');
+            
+            const versionOnlyPotentialGems = potentialGems + lanternPotentialGems + customPotentialGems + manualGems;
             const versionOnlyPotentialWishes = potentialWishes + lanternPotentialWishes + customPotentialWishes + manualWishes;
             document.getElementById('versionPotentialWishes').innerText = Math.floor(versionOnlyPotentialGems / 160) + versionOnlyPotentialWishes;
+            
             const totalPotentialGems = potentialGems + lanternPotentialGems + customPotentialGems;
             const totalPotentialWishesCount = potentialWishes + lanternPotentialWishes + customPotentialWishes;
+            
             let earnedGems = daysDone * 60;
             if (isChecked('welkin')) earnedGems += (daysDone * 90);
             let earnedLanternWishes = 0;
             if (ver === "6.3") { if (isChecked('lanternLogin')) earnedLanternWishes += 10; if (isChecked('lanternMail')) earnedGems += 1600; if (isChecked('check_lantern_bonus')) earnedGems += getV('lanternBonus'); }
             let customEarnedGems = 0; let customEarnedWishes = 0;
             customCards.forEach(card => card.items.forEach(item => { if (item.isChecked) { const val = parseInt(item.value) || 0; if(item.type === 'wishes') customEarnedWishes += val; else customEarnedGems += val; } }));
-            let currentPoolGems = inventoryGems + earnedGems + customEarnedGems;
+            
+            let currentPoolGems = inventoryGems + earnedGems + customEarnedGems + manualGems;
             let currentPoolWishes = manualWishes + earnedLanternWishes + customEarnedWishes;
             let finalWishesPool = Math.max(0, currentPoolWishes - spentWishes);
             let finalGemsPool = Math.max(0, currentPoolGems - (spentGemsWishes * 160));
+            
             document.getElementById('earnedGems').innerText = (currentPoolGems + (currentPoolWishes * 160)).toLocaleString();
             document.getElementById('earnedWishesNum').innerText = Math.floor(currentPoolGems / 160) + currentPoolWishes;
             document.getElementById('currentBalanceGems').innerText = finalGemsPool.toLocaleString();
             document.getElementById('currentBalanceWishes').innerText = finalWishesPool;
             const currentTotalWishes = Math.floor(finalGemsPool / 160) + finalWishesPool;
             document.getElementById('currentBalanceLabel').innerText = currentTotalWishes;
+            
             let totalSpent = spentWishes + spentGemsWishes;
             let totalPrevSpent = prevSpentWishes + prevSpentGemsWishes;
             let deltaSpent = totalSpent - totalPrevSpent;
             if (deltaSpent !== 0) { currentPity += deltaSpent; if (currentPity < 0) currentPity = 0; }
             document.getElementById('currentPityDisplay').innerText = currentPity;
             prevSpentWishes = spentWishes; prevSpentGemsWishes = spentGemsWishes;
-            const grandTotalPotentialPullable = Math.floor((totalPotentialGems + inventoryGems) / 160) + totalPotentialWishesCount + manualWishes;
+            
+            const grandTotalPotentialPullable = Math.floor((totalPotentialGems + inventoryGems + manualGems) / 160) + totalPotentialWishesCount + manualWishes;
             document.getElementById('totalPotentialWishes').innerText = grandTotalPotentialPullable;
             const finalPot = Math.max(0, grandTotalPotentialPullable - totalSpent);
             document.getElementById('totalFinalWishes').innerText = finalPot;
             document.getElementById('remainingToGet').innerText = Math.max(0, finalPot - currentTotalWishes);
+            
             const totalMaxGemsEquiv = totalPotentialGems + (totalPotentialWishesCount * 160);
             const currentEarnedGemsEquiv = earnedGems + customEarnedGems + (earnedLanternWishes * 160) + (customEarnedWishes * 160) + (ver === "6.3" && isChecked('lanternMail') ? 1600 : 0) + (ver === "6.3" && isChecked('check_lantern_bonus') ? getV('lanternBonus') : 0);
             const pct = totalMaxGemsEquiv > 0 ? Math.min(100, Math.floor((currentEarnedGemsEquiv / totalMaxGemsEquiv) * 100)) : 0;
             document.getElementById('percentLabel').innerText = pct;
             document.getElementById('progressBar').style.width = pct + '%';
             
-            // PROTECCIÓN: Solo guardamos si la sincronización inicial ha terminado
             if (isAppReady && initialSyncDone) { saveState(isUserAction); propagateChain(isUserAction); }
         }
 
@@ -823,6 +861,7 @@
         function addSpentWishes(n) { document.getElementById('spentWishes').value = Math.max(0, (parseInt(document.getElementById('spentWishes').value) || 0) + n); calculate(true); }
         function addSpentGemsWishes(n) { document.getElementById('spentGemsWishes').value = Math.max(0, (parseInt(document.getElementById('spentGemsWishes').value) || 0) + n); calculate(true); }
         function addManualWishes(n) { document.getElementById('manualWishes').value = Math.max(0, (parseInt(document.getElementById('manualWishes').value) || 0) + n); calculate(true); }
+        function addManualGems(n) { document.getElementById('manualGems').value = Math.max(0, (parseInt(document.getElementById('manualGems').value) || 0) + n); calculate(true); }
         function toggleItemR2(cardId, itemId) { const card = customCards.find(c => c.id === cardId); if (card) { const item = card.items.find(i => i.id === itemId); if (item) { item.r2Disabled = !item.r2Disabled; renderCustomCards(); calculate(true); } } }
         function renameCurrentVersion() { const select = document.getElementById('gameVersion'); const oldKey = select.value; if (oldKey === "6.3") return; showCustomModal({ title: "Renombrar", hasInput: true, showCancel: true, onConfirm: (newName) => { if (!newName) return; const newKey = newName.trim(); customVersions[newKey] = customVersions[oldKey]; delete customVersions[oldKey]; if (versionProgress[oldKey]) { versionProgress[newKey] = versionProgress[oldKey]; delete versionProgress[oldKey]; } updateSelectOptions(); select.value = newKey; saveState(true); } }); }
         
